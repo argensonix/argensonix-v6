@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import HeroSection from "../components/home/HeroSection.astro";
+import IntroSection from "../components/home/IntroSection.astro";
+import LatestArticles from "../components/home/LatestArticles.astro";
+import LatestSnaps from "../components/home/LatestSnaps.astro";
+import CtaSection from "../components/home/CtaSection.astro";
+
+import { articles } from "../data/articles";
+import { snaps } from "../data/snaps";
+---
+
+<BaseLayout
+  title="Argensonix — Love for design since 1999"
+  description="Argensonix Multimedia. Web, animation, graphic design and more. Buenos Aires, Argentina."
+>
+  <SiteHeader />
+
+  <main id="main-content">
+    <HeroSection />
+    <IntroSection />
+    <LatestArticles articles={articles} />
+    <LatestSnaps snaps={snaps} />
+    <CtaSection />
+  </main>
+
+  <SiteFooter />
+</BaseLayout>

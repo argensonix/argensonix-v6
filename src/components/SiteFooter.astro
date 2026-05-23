@@ -1,0 +1,209 @@
+---
+const year = new Date().getFullYear();
+
+const socialLinks = [
+  {
+    label: "LinkedIn",
+    href: "https://ar.linkedin.com/in/nicolaszicarelli/",
+    external: true,
+  },
+  {
+    label: "Blog",
+    href: "https://nico.ar",
+    external: true,
+  },
+  {
+    label: "Email",
+    href: "mailto:nico@argensonix.com.ar",
+    external: false,
+  },
+];
+
+const navLinks = [
+  { label: "About", href: "/#about" },
+  { label: "Work", href: "/work" },
+  { label: "Contact", href: "/contact" },
+];
+---
+
+<footer class="site-footer" role="contentinfo">
+  <div class="site-footer__inner container">
+
+    <div class="site-footer__top">
+      <!-- Brand -->
+      <div class="site-footer__brand">
+        <a href="/" class="site-footer__logo" aria-label="Argensonix — home">
+          <img src="/img/logo.svg" alt="Argensonix" width="140" height="38" loading="lazy" />
+        </a>
+        <p class="site-footer__tagline">Love for design since 1999</p>
+      </div>
+
+      <!-- Nav -->
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <ul role="list">
+          {navLinks.map((link) => (
+            <li>
+              <a href={link.href} class="site-footer__nav-link">{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <!-- Social -->
+      <div class="site-footer__social">
+        <p class="site-footer__social-label">Connect</p>
+        <ul role="list">
+          {socialLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="site-footer__social-link"
+                {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              >
+                {link.label}
+                {link.external && <span aria-hidden="true"> ↗</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <hr class="site-footer__rule" />
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__copy">
+        &copy; 1999–{year} Argensonix Multimedia
+      </p>
+      <p class="site-footer__location">Made in Buenos Aires</p>
+    </div>
+
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--brand-blue);
+    color: var(--ink-on-brand);
+    padding-top: var(--space-16);
+    padding-bottom: var(--space-8);
+    margin-top: var(--space-32);
+  }
+
+  .site-footer__top {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: var(--space-16);
+    align-items: start;
+    padding-bottom: var(--space-12);
+  }
+
+  /* Brand */
+  .site-footer__logo img {
+    height: 32px;
+    width: auto;
+    filter: brightness(0) invert(1); /* ensure white on any bg */
+    opacity: 0.9;
+  }
+
+  .site-footer__logo:hover img {
+    opacity: 1;
+  }
+
+  .site-footer__tagline {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    opacity: 0.7;
+    font-style: italic;
+  }
+
+  /* Nav */
+  .site-footer__nav ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .site-footer__nav-link {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    transition: opacity var(--transition);
+  }
+
+  .site-footer__nav-link:hover {
+    opacity: 1;
+  }
+
+  /* Social */
+  .site-footer__social ul {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .site-footer__social-label {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin-bottom: var(--space-3);
+  }
+
+  .site-footer__social-link {
+    font-size: var(--text-sm);
+    opacity: 0.75;
+    transition: opacity var(--transition);
+  }
+
+  .site-footer__social-link:hover {
+    opacity: 1;
+  }
+
+  /* Rule */
+  .site-footer__rule {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: var(--space-8);
+  }
+
+  /* Bottom bar */
+  .site-footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .site-footer__copy,
+  .site-footer__location {
+    font-size: var(--text-xs);
+    opacity: 0.55;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .site-footer__top {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
+
+    .site-footer__nav ul,
+    .site-footer__social ul {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .site-footer__bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+  }
+</style>

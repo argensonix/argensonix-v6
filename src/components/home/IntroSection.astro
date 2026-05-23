@@ -1,0 +1,117 @@
+---
+// Static editorial copy — edit directly here
+---
+
+<section class="intro section section--sm" id="about" aria-labelledby="intro-heading">
+  <div class="intro__inner container">
+
+    <div class="intro__text">
+      <span class="eyebrow">About</span>
+      <h2 class="intro__heading h-lg" id="intro-heading">
+        Powered by the web since 1999.
+      </h2>
+      <p class="intro__body lead">
+        Argensonix Multimedia is the creative studio of Nicolás Zicarelli, a
+        Product Designer and Multimedia producer based in Buenos Aires. From
+        an ecology portal to an online radio station, all projects share the
+        same spirit: curiosity and the drive to do and learn.
+      </p>
+      <a href="/work" class="btn btn--ghost">
+        See the work →
+      </a>
+    </div>
+
+    <div class="intro__stats" aria-hidden="true">
+      <div class="intro__stat">
+        <span class="intro__stat-number">25+</span>
+        <span class="intro__stat-label">Years of practice</span>
+      </div>
+      <div class="intro__stat">
+        <span class="intro__stat-number">5</span>
+        <span class="intro__stat-label">Disciplines</span>
+      </div>
+      <div class="intro__stat">
+        <span class="intro__stat-number">∞</span>
+        <span class="intro__stat-label">Curiosity</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .intro {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+
+  .intro__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-16);
+    align-items: center;
+  }
+
+  .intro__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    max-width: var(--max-width-text);
+  }
+
+  .intro__heading {
+    color: var(--dark-blue);
+  }
+
+  .intro__body {
+    color: var(--ink-muted);
+  }
+
+  /* Stats */
+  .intro__stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    min-width: 160px;
+  }
+
+  .intro__stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    border-left: 3px solid var(--brand-blue);
+    padding-left: var(--space-4);
+  }
+
+  .intro__stat-number {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 800;
+    color: var(--dark-blue);
+    line-height: 1;
+  }
+
+  .intro__stat-label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .intro__inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-10);
+    }
+
+    .intro__stats {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--space-6);
+      min-width: auto;
+    }
+  }
+</style>

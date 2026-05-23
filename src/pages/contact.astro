@@ -1,0 +1,263 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+---
+
+<BaseLayout
+  title="Contact — Argensonix"
+  description="Get in touch with Argensonix Multimedia. Web design, animation, graphic design and more."
+>
+  <SiteHeader />
+
+  <main id="main-content">
+
+    <div class="contact-layout section">
+      <div class="container">
+        <div class="contact-grid">
+
+          <!-- Left: copy -->
+          <div class="contact-intro">
+            <span class="eyebrow">Contact</span>
+            <h1 class="contact-intro__title h-xl">Let's work<br /> together.</h1>
+            <p class="contact-intro__lead lead">
+              Got a project in mind? Looking for a designer or multimedia
+              producer? Let's talk.
+            </p>
+
+            <ul class="contact-channels" role="list">
+              <li class="contact-channel">
+                <span class="contact-channel__label">Email</span>
+                <a
+                  href="mailto:nico@argensonix.com.ar"
+                  class="contact-channel__value"
+                >
+                  nico@argensonix.com.ar
+                </a>
+              </li>
+              <li class="contact-channel">
+                <span class="contact-channel__label">LinkedIn</span>
+                <a
+                  href="https://ar.linkedin.com/in/nicolaszicarelli/"
+                  class="contact-channel__value"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  nicolaszicarelli ↗
+                </a>
+              </li>
+              <li class="contact-channel">
+                <span class="contact-channel__label">Blog</span>
+                <a
+                  href="https://nico.ar"
+                  class="contact-channel__value"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  nico.ar ↗
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right: form -->
+          <div class="contact-form-wrap">
+            <form
+              class="contact-form"
+              name="contact"
+              method="POST"
+              action="/contact"
+              novalidate
+            >
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="name">Name</label>
+                <input
+                  class="contact-form__input"
+                  type="text"
+                  id="name"
+                  name="name"
+                  autocomplete="name"
+                  required
+                  placeholder="Your name"
+                />
+              </div>
+
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="email">Email</label>
+                <input
+                  class="contact-form__input"
+                  type="email"
+                  id="email"
+                  name="email"
+                  autocomplete="email"
+                  required
+                  placeholder="your@email.com"
+                />
+              </div>
+
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="subject">Subject</label>
+                <input
+                  class="contact-form__input"
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  placeholder="What's this about?"
+                />
+              </div>
+
+              <div class="contact-form__field">
+                <label class="contact-form__label" for="message">Message</label>
+                <textarea
+                  class="contact-form__input contact-form__textarea"
+                  id="message"
+                  name="message"
+                  rows="6"
+                  required
+                  placeholder="Tell me about your project..."
+                ></textarea>
+              </div>
+
+              <button type="submit" class="btn btn--primary contact-form__submit">
+                Send message
+              </button>
+
+              <!-- Wire up to a backend/Netlify forms/Formspree as needed -->
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-24);
+    align-items: start;
+  }
+
+  /* Intro */
+  .contact-intro {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    position: sticky;
+    top: calc(64px + var(--space-8));
+  }
+
+  .contact-intro__title {
+    color: var(--dark-blue);
+    margin-top: var(--space-2);
+  }
+
+  /* Channels */
+  .contact-channels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+  }
+
+  .contact-channel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .contact-channel__label {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .contact-channel__value {
+    font-size: var(--text-base);
+    color: var(--brand-blue);
+    font-weight: 500;
+    transition: color var(--transition);
+  }
+
+  .contact-channel__value:hover {
+    color: var(--brand-blue-dark);
+  }
+
+  /* Form */
+  .contact-form-wrap {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .contact-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .contact-form__label {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .contact-form__input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    color: var(--ink);
+    background: var(--bg);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    outline: none;
+  }
+
+  .contact-form__input:focus {
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 3px rgba(0, 183, 255, 0.15);
+  }
+
+  .contact-form__input::placeholder {
+    color: var(--ink-soft);
+  }
+
+  .contact-form__textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  .contact-form__submit {
+    align-self: flex-start;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+    }
+
+    .contact-intro {
+      position: static;
+    }
+  }
+</style>

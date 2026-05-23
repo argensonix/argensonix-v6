@@ -1,0 +1,57 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import WorkGrid from "../components/work/WorkGrid.astro";
+
+import { workItems } from "../data/work";
+---
+
+<BaseLayout
+  title="Work — Argensonix"
+  description="Portfolio of web, animation, graphic design, logos, and multimedia production by Argensonix Multimedia."
+>
+  <SiteHeader />
+
+  <main id="main-content">
+
+    <!-- Page header -->
+    <section class="page-hero section section--sm">
+      <div class="container">
+        <span class="eyebrow">Portfolio</span>
+        <h1 class="page-hero__title h-xl">Work</h1>
+        <p class="page-hero__lead lead">
+          A selection of projects across web, animation, graphic design, logos and
+          multimedia production.
+        </p>
+      </div>
+    </section>
+
+    <!-- Work grid -->
+    <section class="section section--sm" aria-label="Work portfolio">
+      <div class="container">
+        <WorkGrid items={workItems} />
+      </div>
+    </section>
+
+  </main>
+
+  <SiteFooter />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .page-hero__title {
+    color: var(--dark-blue);
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .page-hero__lead {
+    max-width: 560px;
+  }
+</style>
