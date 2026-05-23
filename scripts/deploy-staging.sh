@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO_DIR="/srv/repos/personal/argensonix/argensonix-v6"
 BRANCH="main"
-WEB_ROOT="/srv/data/www/staging.argensonix.net"
+WEB_ROOT="/srv/staging/personal/argensonix-v6"
 LOG_DIR="/srv/logs/argensonix-v6"
 LOG_FILE="${LOG_DIR}/deploy-staging.log"
 
