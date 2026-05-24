@@ -4,6 +4,8 @@ import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import HeroSection from "../components/home/HeroSection.astro";
 import IntroSection from "../components/home/IntroSection.astro";
+import ServicesSection from "../components/home/ServicesSection.astro";
+import FeaturedWork from "../components/home/FeaturedWork.astro";
 import LatestArticles from "../components/home/LatestArticles.astro";
 import LatestSnaps from "../components/home/LatestSnaps.astro";
 import CtaSection from "../components/home/CtaSection.astro";
@@ -21,6 +23,8 @@ import { snaps } from "../data/snaps";
   <main id="main-content">
     <HeroSection />
     <IntroSection />
+    <ServicesSection />
+    <FeaturedWork />
     <LatestArticles articles={articles} />
     <LatestSnaps snaps={snaps} />
     <CtaSection />

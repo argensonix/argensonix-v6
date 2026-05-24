@@ -41,16 +41,21 @@ const currentPath = Astro.url.pathname;
       </ul>
     </nav>
 
-    <!-- Mobile nav toggle (CSS-only via checkbox) -->
-    <label class="nav-toggle" for="nav-toggle" aria-label="Toggle navigation">
+    <!-- Mobile nav toggle (JS-controlled, proper ARIA) -->
+    <button
+      type="button"
+      class="nav-toggle"
+      aria-label="Toggle navigation"
+      aria-expanded="false"
+      aria-controls="mobile-nav"
+    >
       <span class="nav-toggle__bar"></span>
       <span class="nav-toggle__bar"></span>
       <span class="nav-toggle__bar"></span>
-    </label>
-    <input type="checkbox" id="nav-toggle" class="nav-toggle__input" aria-hidden="true" />
+    </button>
 
     <!-- Mobile nav drawer -->
-    <nav class="site-nav--mobile" aria-label="Mobile navigation">
+    <nav id="mobile-nav" class="site-nav--mobile" aria-label="Mobile navigation" hidden>
       <ul class="site-nav--mobile__list" role="list">
         {navLinks.map((link) => (
           <li>
@@ -62,6 +67,29 @@ const currentPath = Astro.url.pathname;
 
   </div>
 </header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>(".nav-toggle");
+  const mobileNav = document.getElementById("mobile-nav");
+
+  if (toggle && mobileNav) {
+    toggle.addEventListener("click", () => {
+      const isOpen = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", isOpen ? "false" : "true");
+      toggle.classList.toggle("nav-toggle--open", !isOpen);
+      mobileNav.hidden = isOpen;
+    });
+
+    // Close when any mobile nav link is clicked
+    mobileNav.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", () => {
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.classList.remove("nav-toggle--open");
+        mobileNav.hidden = true;
+      });
+    });
+  }
+</script>
 
 <style>
   /* ---- Header shell ---- */
@@ -118,15 +146,7 @@ const currentPath = Astro.url.pathname;
     border-bottom-color: rgba(255, 255, 255, 0.7);
   }
 
-  /* ---- Mobile toggle ---- */
-  .nav-toggle__input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-  }
-
+  /* ---- Mobile toggle button ---- */
   .nav-toggle {
     display: none;
     flex-direction: column;
@@ -134,9 +154,11 @@ const currentPath = Astro.url.pathname;
     gap: 5px;
     width: 36px;
     height: 36px;
-    cursor: pointer;
     padding: 6px;
     border-radius: var(--radius);
+    background: transparent;
+    border: none;
+    cursor: pointer;
     transition: background var(--transition);
   }
 
@@ -151,22 +173,25 @@ const currentPath = Astro.url.pathname;
     background: #ffffff;
     border-radius: 2px;
     transition: transform var(--transition), opacity var(--transition);
+    transform-origin: center;
   }
 
-  /* Animate toggle bars when open */
-  .nav-toggle__input:checked ~ .site-header__inner .nav-toggle .nav-toggle__bar:nth-child(1) {
+  /* Animate bars to X when open */
+  .nav-toggle--open .nav-toggle__bar:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
   }
-  .nav-toggle__input:checked ~ .site-header__inner .nav-toggle .nav-toggle__bar:nth-child(2) {
+
+  .nav-toggle--open .nav-toggle__bar:nth-child(2) {
     opacity: 0;
+    transform: scaleX(0);
   }
-  .nav-toggle__input:checked ~ .site-header__inner .nav-toggle .nav-toggle__bar:nth-child(3) {
+
+  .nav-toggle--open .nav-toggle__bar:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
   }
 
   /* ---- Mobile nav drawer ---- */
   .site-nav--mobile {
-    display: none;
     position: absolute;
     top: 96px;
     left: 0;
@@ -174,6 +199,11 @@ const currentPath = Astro.url.pathname;
     background: var(--brand-blue-dark);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 99;
+  }
+
+  /* hidden attribute overrides display; this sets the shown state */
+  .site-nav--mobile:not([hidden]) {
+    display: block;
   }
 
   .site-nav--mobile__list {
@@ -207,11 +237,6 @@ const currentPath = Astro.url.pathname;
 
     .nav-toggle {
       display: flex;
-    }
-
-    /* Show mobile nav when checkbox is checked */
-    .nav-toggle__input:checked + .site-nav--mobile {
-      display: block;
     }
   }
 </style>

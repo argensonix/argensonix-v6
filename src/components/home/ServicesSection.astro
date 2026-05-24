@@ -1,0 +1,118 @@
+---
+const disciplines = [
+  { index: "01", label: "Web Design & Development", years: "25+" },
+  { index: "02", label: "Animation & Motion", years: "15+" },
+  { index: "03", label: "Graphic Design", years: "25+" },
+  { index: "04", label: "Logo & Brand Identity", years: "20+" },
+  { index: "05", label: "Audio & Video Production", years: "15+" },
+];
+---
+
+<section class="services section section--sm" aria-labelledby="services-heading">
+  <div class="container">
+
+    <div class="services__header" data-reveal>
+      <div>
+        <span class="eyebrow">What we do</span>
+        <h2 class="services__title h-lg" id="services-heading">
+          Five disciplines,<br />one studio.
+        </h2>
+      </div>
+      <a href="/about" class="btn btn--ghost services__link">
+        About Argensonix →
+      </a>
+    </div>
+
+    <ul class="services__list" role="list">
+      {disciplines.map((d, i) => (
+        <li
+          class="service-item"
+          data-reveal
+          data-reveal-delay={String(Math.min(i + 1, 5))}
+        >
+          <span class="service-item__index">{d.index}</span>
+          <span class="service-item__label">{d.label}</span>
+          <span class="service-item__years">{d.years} yrs</span>
+        </li>
+      ))}
+    </ul>
+
+  </div>
+</section>
+
+<style>
+  .services {
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .services__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-8);
+    margin-bottom: var(--space-10);
+    flex-wrap: wrap;
+  }
+
+  .services__title {
+    color: var(--dark-blue);
+    margin-top: var(--space-2);
+  }
+
+  .services__link {
+    flex-shrink: 0;
+    margin-bottom: var(--space-2);
+  }
+
+  .services__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-item {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-5) 0;
+    border-top: 1px solid var(--line);
+    transition: color var(--transition);
+  }
+
+  .service-item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .service-item__index {
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  .service-item__label {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .service-item__years {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--brand-blue);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 560px) {
+    .service-item {
+      grid-template-columns: 32px 1fr;
+    }
+
+    .service-item__years {
+      display: none;
+    }
+  }
+</style>
