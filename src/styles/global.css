@@ -439,10 +439,12 @@ h1, h2, h3, h4, h5, h6 {
     transition: none;
   }
 
-  /* Kill hero entry animations */
+  /* Kill hero entry animations — also reset opacity so content isn't stuck invisible */
   *[style*="animation"],
   .hero-animate {
     animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   /* Flatten all transitions */
