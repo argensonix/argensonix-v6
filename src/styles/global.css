@@ -1,69 +1,16 @@
 /* ==========================================================================
    Argensonix v6 — Global foundation
-   Order: tokens -> @font-face -> reset -> base elements -> themes ->
+   Order: tokens -> reset -> base elements -> themes ->
    layout primitives -> utilities -> a11y / motion.
    ========================================================================== */
 
 @import "./tokens.css";
 
 /* --------------------------------------------------------------------------
-   Self-hosted fonts
-   Drop the matching .woff2 files into /public/fonts/ using these exact names.
-   Until then, text falls back to the system stack defined in tokens.css.
+   Fonts
+   Geist + JetBrains Mono are loaded from Google Fonts in the document <head>
+   (see BaseLayout.astro). Family stacks + fallbacks live in tokens.css.
    -------------------------------------------------------------------------- */
-
-/* Geist Sans — 400 / 500 / 600 / 700 / 800 */
-@font-face {
-  font-family: "Geist";
-  src: url("/fonts/Geist-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist";
-  src: url("/fonts/Geist-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist";
-  src: url("/fonts/Geist-SemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist";
-  src: url("/fonts/Geist-Bold.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist";
-  src: url("/fonts/Geist-ExtraBold.woff2") format("woff2");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* JetBrains Mono — 400 / 500 */
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/JetBrainsMono-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
 
 /* --------------------------------------------------------------------------
    Reset

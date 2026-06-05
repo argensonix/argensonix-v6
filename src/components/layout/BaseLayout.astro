@@ -1,7 +1,7 @@
 ---
 /**
  * BaseLayout — the HTML shell.
- * Owns <head> meta + global styles (which pull in tokens and @font-face).
+ * Owns <head> meta + global styles (which pull in tokens) + Google Fonts.
  * Pages compose <Header />, <main> and <Footer /> inside the slot.
  */
 import "../../styles/global.css";
@@ -28,6 +28,14 @@ const ogImageUrl = new URL(ogImage, site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Fonts: Geist + JetBrains Mono via Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    />
 
     <title>{title}</title>
     <meta name="description" content={description} />
