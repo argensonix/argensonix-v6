@@ -9,9 +9,7 @@
     "check": "astro check"
   },
   "dependencies": {
-    "astro": "^5.18.0",
-    "@fontsource-variable/dm-sans": "^5.2.6",
-    "@fontsource-variable/rubik": "^5.2.6"
+    "astro": "^5.18.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.6",

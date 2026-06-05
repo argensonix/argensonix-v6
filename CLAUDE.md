@@ -1,117 +1,88 @@
-# Argensonix v6 — Claude Code Design Guidelines
+# Argensonix v6 — Design & build guidelines
 
-This file defines the frontend design principles and conventions for this project.
-When editing or creating any component, layout, or style, apply these guidelines consistently.
+Argensonix is a personal digital lab: design, web, radio, writing, tools.
+The aesthetic is editorial, technical and human — not a SaaS landing page,
+not a portfolio. Apply these conventions consistently when building any
+component, layout or page.
 
 ---
 
 ## Stack
 
-- **Framework**: Astro
-- **CSS**: Bootstrap 5 + custom properties in `src/styles/global.css`
-- **Language**: TypeScript for data files
-- **Target**: Static site, production-grade, fast
+- **Framework**: Astro (static output) with content collections
+- **Styling**: custom CSS + CSS custom properties only — **no Bootstrap, no
+  Tailwind, no UI framework, no preprocessors, no CSS Modules**
+- **Class naming**: BEM-style, global tokens
+- **JS**: vanilla only, where genuinely needed (e.g. nav toggle, Stage 3 filter)
+- **Language**: TypeScript for data/config; all code comments in English
 
 ---
 
-## Brand Tokens
+## Tokens — `src/styles/tokens.css`
 
-Always use these CSS custom properties. Never hardcode colors.
+Single source of truth. **Never hardcode colors, type sizes or spacing** —
+always reference the variables.
 
-```css
---brand-blue:      #00b7ff   /* Primary — header, accents, links */
---brand-blue-dark: #0098d4   /* Hover states */
---dark-blue:       #21346a   /* Headlines, dark sections */
---accent:          #f5a623   /* Secondary CTA, highlights */
---bg:              #f7f7f5   /* General background */
---surface:         #ffffff   /* Cards, panels */
---ink:             #111827   /* Body text */
---ink-muted:       #4b5563   /* Secondary text, captions */
-```
+Key colors: `--bg-dark #081028`, `--bg-dark-2 #101827`, `--bg-dark-card #1C2C58`,
+`--bg-light-blue #E0E8F0`, `--bg-light-neutral #F8F8F8`, `--accent-cyan #00B5FC`,
+`--accent-yellow #E4A800`. Text: `--text-on-dark`, `--text-on-dark-muted`,
+`--text-on-light`, `--text-on-light-muted`. Borders: `--border-light`,
+`--border-dark`.
 
 ---
 
-## Design Principles
+## Typography
 
-### Typography
-- Use characterful, distinctive fonts — avoid Inter, Roboto, Arial, system-ui
-- Pair a strong display/heading font with a refined, readable body font
-- Headlines should have personality: tight tracking, strong weight, clear hierarchy
-- Body text: comfortable line-height (1.6–1.75), moderate size (16–18px base)
-- Use `font-feature-settings` where appropriate (ligatures, tabular nums)
-
-### Color
-- `--brand-blue` is dominant — use it with intention, not decoration
-- `--dark-blue` anchors dark sections; pair with white or `--brand-blue` text
-- `--accent` (#f5a623) is a sharp contrast tool — use sparingly for CTAs only
-- Backgrounds: prefer `--bg` for pages, `--surface` for elevated elements
-- Avoid purple gradients, generic blue-on-white, or evenly distributed palettes
-
-### Layout & Composition
-- Prefer asymmetry and intentional negative space over centered symmetry
-- Use overlapping elements, offset grids, or diagonal accents where meaningful
-- Sections should have distinct visual weight — not every section looks the same
-- Grid-breaking elements (oversized type, bleeds, offsets) add memorability
-
-### Motion & Interaction
-- Animate on scroll: fade + translate-up reveals for sections and cards
-- Staggered animation delays for lists and grids (cards, articles, snaps)
-- Hover states: smooth transitions (200–300ms ease), color shifts, subtle lifts
-- Avoid animation for decoration only — every motion should reinforce meaning
-- Use `prefers-reduced-motion` media query to disable animations for accessibility
-
-### Backgrounds & Depth
-- Avoid flat solid backgrounds — add subtle texture, gradient mesh, or noise
-- Dark sections (`--dark-blue`) can use a radial gradient or soft vignette
-- Cards: use `box-shadow` with color tint (e.g. blue-tinted shadow) not generic grey
-- Hero section: go bold — large type, layered depth, strong visual entry point
+- **Geist Sans** (`--font-sans`): all headings, body text, navigation, CTA
+  button labels. Self-hosted, weights 400/500/600/700/800.
+- **JetBrains Mono** (`--font-mono`): eyebrow labels ("01 — MANIFESTO"), tags,
+  dates, metadata, filter pills, small uppercase buttons ("GET IN TOUCH"),
+  footer version/copyright. Letter-spacing `--tracking-mono` (0.06em).
+- JetBrains Mono must **never** appear in paragraph text or main headings.
+- Font files live in `/public/fonts/` (see `global.css` for exact filenames).
 
 ---
 
-## Component Conventions
+## Section theme system — `src/styles/global.css`
 
-### SiteHeader.astro
-- Sticky, with backdrop blur on scroll
-- Active link indicator using `--brand-blue`
-- Mobile: hamburger with smooth drawer, not a jump
+Each full-bleed section gets one theme class that sets its background and the
+local `--fg` / `--muted` / `--rule` / `--surface` variables. Children read
+those variables, so text color adapts automatically.
 
-### HeroSection.astro
-- Full visual impact — this is the first thing users see
-- Large headline, strong typographic hierarchy
-- Subtle animated entry (staggered reveals)
-- Clear primary CTA using `--brand-blue`, secondary using `--accent`
+`.theme-dark` · `.theme-dark-2` · `.theme-light-blue` · `.theme-light`
 
-### LatestArticles.astro / LatestSnaps.astro
-- Card grid with staggered scroll animations
-- Hover: lift + color-tinted shadow
-- Image aspect ratio locked, no layout shift
-
-### CtaSection.astro
-- Dark background (`--dark-blue`)
-- High contrast, bold typography
-- Single focused action — no clutter
-
-### WorkGrid.astro / WorkItem.astro
-- Portfolio items need visual breathing room
-- Hover reveals overlay or metadata
-- Consistent image treatment across items
+The page rhythm alternates these (dark hero → light-blue manifesto →
+light-neutral projects → dark journal/CTA → dark footer).
 
 ---
 
-## What to Avoid
+## Components
 
-- Generic AI-aesthetics: purple gradients, Inter/Roboto, centered everything
-- Uniform section weight (every section looks the same height and density)
-- Decorative animations with no purpose
-- Hardcoded hex values — always use the brand tokens above
-- Bootstrap defaults without customization — override to match the brand
+- **Layout** (`src/components/layout/`): `BaseLayout` (HTML shell + head meta +
+  global styles), `Header` (sticky dark nav, `activePage` prop, cyan active
+  underline), `Footer` (logo + nav + social SVGs + copyright strip).
+- **UI** (`src/components/ui/`): `EyebrowLabel` (text, theme), `Button`
+  (label, href, variant `primary|link`, uppercase), `Tag` (label, variant
+  `default|filter`, active).
+- **Content** (`src/content/projects/`): markdown case studies validated by
+  `src/content/config.ts`.
 
 ---
 
-## When Editing Components
+## Hard constraints
 
-1. Preserve existing brand tokens — don't introduce new colors
-2. Add motion with `prefers-reduced-motion` fallbacks
-3. Keep markup semantic and accessible (ARIA labels, alt text, heading order)
-4. Comment non-obvious CSS in English
-5. Test at 375px, 768px, and 1280px breakpoints minimum
+- **No box-shadows on cards** — max `--shadow-card` (`0 1px 3px rgba(0,0,0,.05)`).
+- All images need `alt` attributes; cards must render gracefully with no thumbnail.
+- All interactive elements need a visible focus state in `--accent-cyan`
+  (handled globally via `:focus-visible`).
+- Provide `prefers-reduced-motion` fallbacks for any animation.
+- Accent backgrounds (yellow button, active cyan pill) use **dark text** for
+  WCAG AA contrast.
+- Don't touch infrastructure (`.github/`, `scripts/`, deploy config).
+
+---
+
+## Build
+
+`npm run dev` · `npm run build` · `npm run preview` · `npm run check`
+(`astro check` runs the TypeScript + content-collection validation).

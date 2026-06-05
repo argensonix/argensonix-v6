@@ -1,0 +1,106 @@
+/* ==========================================================================
+   Argensonix v6 — Design tokens
+   Single source of truth for color, type, spacing and layout primitives.
+   Never hardcode these values in components; always reference the variables.
+   ========================================================================== */
+
+:root {
+  /* --- Color: dark surfaces -------------------------------------------- */
+  --bg-dark: #081028;        /* Primary dark background (hero, footer) */
+  --bg-dark-2: #101827;      /* Secondary dark background, subtle step */
+  --bg-dark-card: #1c2c58;   /* Cards / metadata panels on dark */
+
+  /* --- Color: light surfaces ------------------------------------------- */
+  --bg-light-blue: #e0e8f0;     /* Cool light section (manifesto, story) */
+  --bg-light-neutral: #f8f8f8;  /* Neutral light section (projects) */
+
+  /* --- Color: text ----------------------------------------------------- */
+  --text-on-dark: #ffffff;
+  --text-on-dark-muted: rgba(255, 255, 255, 0.6);
+  --text-on-light: #081028;
+  --text-on-light-muted: #3a4a6b;
+
+  /* --- Color: accents -------------------------------------------------- */
+  --accent-cyan: #00b5fc;
+  --accent-yellow: #e4a800;
+  /* Hover shades, derived from the accents above */
+  --accent-cyan-hover: #33c4fd;
+  --accent-yellow-hover: #c99500;
+
+  /* --- Color: borders / hairlines -------------------------------------- */
+  --border-light: rgba(0, 0, 0, 0.08);   /* Hairlines on light surfaces */
+  --border-dark: rgba(255, 255, 255, 0.1); /* Hairlines on dark surfaces */
+
+  /* --- Typography: families -------------------------------------------- */
+  /* Geist Sans: headings, body, navigation, CTA labels.
+     JetBrains Mono: eyebrows, tags, dates, metadata, small uppercase UI. */
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Menlo",
+    "Consolas", monospace;
+
+  /* --- Typography: fixed scale (rem) ----------------------------------- */
+  --text-xs: 0.75rem;    /* 12px — mono labels, footer */
+  --text-sm: 0.875rem;   /* 14px — tags, nav, captions */
+  --text-base: 1rem;     /* 16px — body */
+  --text-md: 1.125rem;   /* 18px — lead paragraphs */
+  --text-lg: 1.375rem;   /* 22px */
+  --text-xl: 1.75rem;    /* 28px */
+  --text-2xl: 2.25rem;   /* 36px */
+  --text-3xl: 3rem;      /* 48px */
+
+  /* --- Typography: fluid display sizes --------------------------------- */
+  --text-display: clamp(2.4rem, 1rem + 5vw, 4.75rem);       /* Hero headline */
+  --text-statement: clamp(2rem, 1.2rem + 2.8vw, 3.25rem);   /* Manifesto */
+
+  /* --- Typography: weights --------------------------------------------- */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* --- Typography: line-height & tracking ------------------------------ */
+  --leading-tight: 1.05;
+  --leading-snug: 1.2;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+  --tracking-mono: 0.06em;   /* Required spacing for JetBrains Mono UI */
+  --tracking-tight: -0.02em; /* Large Geist headings */
+
+  /* --- Spacing scale --------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --space-10: 4rem;
+  --space-12: 5rem;
+  --space-16: 6rem;
+  --space-20: 8rem;
+
+  /* --- Layout ---------------------------------------------------------- */
+  --container-max: 1320px;
+  --container-pad: clamp(1.25rem, 5vw, 4rem);
+  --section-py: clamp(4rem, 8vw, 8rem);
+  --header-height: 88px;
+
+  /* --- Radius ---------------------------------------------------------- */
+  --radius-sm: 6px;
+  --radius: 10px;     /* Default card radius */
+  --radius-lg: 16px;  /* Large panels (CTA) */
+  --radius-pill: 999px;
+
+  /* --- Elevation ------------------------------------------------------- */
+  /* Per design rules: cards have NO shadow, or at most this whisper. */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  /* --- Focus ----------------------------------------------------------- */
+  --focus-ring: 2px solid var(--accent-cyan);
+  --focus-offset: 3px;
+
+  /* --- Motion ---------------------------------------------------------- */
+  --transition: 180ms ease;
+  --transition-slow: 260ms ease;
+}

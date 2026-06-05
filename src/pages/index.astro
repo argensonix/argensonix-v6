@@ -1,30 +1,337 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import HeroSection from "../components/home/HeroSection.astro";
-import IntroSection from "../components/home/IntroSection.astro";
-import LatestArticles from "../components/home/LatestArticles.astro";
-import LatestSnaps from "../components/home/LatestSnaps.astro";
-import CtaSection from "../components/home/CtaSection.astro";
+import BaseLayout from "../components/layout/BaseLayout.astro";
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+import Button from "../components/ui/Button.astro";
+import Tag from "../components/ui/Tag.astro";
+import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
 
-import { articles } from "../data/articles";
-import { snaps } from "../data/snaps";
+// Stage 1 placeholder data — the real "Selected projects" grid is wired to the
+// content collection in a later stage. Kept inline here only to verify the
+// card surface, no-thumbnail fallback, and tag rendering.
+const placeholderProjects = [
+  {
+    title: "Blur FM",
+    description: "Independent online radio",
+    year: "2011-NOW",
+    tags: ["Branding", "Web"],
+  },
+  {
+    title: "nico://run",
+    description: "Running data, built on a Pi",
+    year: "2026",
+    tags: ["AI", "Web"],
+  },
+  {
+    title: "Aires Pulse",
+    description: "A city, in signals",
+    year: "2026",
+    tags: ["Branding", "Web"],
+  },
+];
 ---
 
-<BaseLayout
-  title="Argensonix — Love for design since 1999"
-  description="Argensonix Multimedia. Web, animation, graphic design and more. Buenos Aires, Argentina."
->
-  <SiteHeader />
+<BaseLayout>
+  <Header activePage="home" />
 
   <main id="main-content">
-    <HeroSection />
-    <IntroSection />
-    <LatestArticles articles={articles} />
-    <LatestSnaps snaps={snaps} />
-    <CtaSection />
+    <!-- ── Hero (dark) ─────────────────────────────────────── -->
+    <section class="hero theme-dark">
+      <div class="container hero__inner">
+        <div class="hero__copy">
+          <h1 class="hero__title">
+            A lab for <span class="text-cyan">design,</span><br />
+            media <span class="hero__amp">&amp;</span> the web.
+          </h1>
+          <p class="hero__lead">
+            Connecting personal projects, writing, radio, tools and homegrown
+            web systems.
+          </p>
+          <div class="hero__actions">
+            <Button label="Explore projects" href="/projects" uppercase />
+          </div>
+        </div>
+        <div class="hero__visual" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- ── Manifesto (light blue) ──────────────────────────── -->
+    <section class="manifesto theme-light-blue section">
+      <div class="container manifesto__inner">
+        <EyebrowLabel text="01 — Manifesto" theme="light" />
+        <div class="manifesto__body">
+          <p class="manifesto__statement">
+            Argensonix is where <span class="text-cyan"
+              >design, code and media experiments</span
+            > come together. A living home for small web projects, personal tools,
+            radio systems, writing and digital things built slowly, carefully and
+            for real use.
+          </p>
+          <Button label="See what's inside" href="/projects" variant="link" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Selected projects (light neutral) ───────────────── -->
+    <section class="selected theme-light section">
+      <div class="container">
+        <div class="selected__head">
+          <div class="selected__heading">
+            <EyebrowLabel text="02 — Selected projects" theme="light" />
+            <h2 class="selected__title">
+              Things made <span class="text-cyan">on purpose</span>
+            </h2>
+          </div>
+          <Button
+            label="View all projects"
+            href="/projects"
+            variant="link"
+            uppercase
+          />
+        </div>
+
+        <ul class="selected__grid" role="list">
+          {
+            placeholderProjects.map((project) => (
+              <li class="card project-card">
+                {/* Decorative placeholder — cards render gracefully with no thumbnail */}
+                <div class="project-card__thumb" aria-hidden="true" />
+                <div class="project-card__body">
+                  <div class="project-card__row">
+                    <h3 class="project-card__title">{project.title}</h3>
+                    <span class="project-card__year">{project.year}</span>
+                  </div>
+                  <p class="project-card__desc">{project.description}</p>
+                  <div class="project-card__tags">
+                    {project.tags.map((tag) => (
+                      <Tag label={tag} />
+                    ))}
+                  </div>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── CTA (dark) ──────────────────────────────────────── -->
+    <section class="cta theme-dark section">
+      <div class="container">
+        <div class="cta__panel">
+          <h2 class="cta__title">Let&rsquo;s build something useful.</h2>
+          <p class="cta__sub">
+            Design, code and media for thoughtful digital projects.
+          </p>
+          <Button label="Get in touch" href="/contact" uppercase />
+        </div>
+      </div>
+    </section>
   </main>
 
-  <SiteFooter />
+  <Footer />
 </BaseLayout>
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────── */
+  .hero {
+    padding-block: clamp(3rem, 7vw, 6rem);
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .hero__title {
+    font-size: var(--text-display);
+    font-weight: var(--weight-extrabold);
+    line-height: 1.04;
+    letter-spacing: var(--tracking-tight);
+    /* Explicit <br> controls the two-line break; don't let balance re-wrap */
+    text-wrap: normal;
+  }
+
+  .hero__amp {
+    color: var(--text-on-dark-muted);
+  }
+
+  .hero__lead {
+    margin-top: var(--space-5);
+    max-width: 42ch;
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+    color: var(--muted);
+  }
+
+  .hero__actions {
+    margin-top: var(--space-6);
+  }
+
+  /* Decorative circle placeholder for a future hero graphic */
+  .hero__visual {
+    justify-self: center;
+    width: min(100%, 360px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--text-on-dark) 12%, transparent);
+  }
+
+  /* ── Manifesto ─────────────────────────────────────────── */
+  .manifesto__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+
+  .manifesto__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    align-items: flex-start;
+  }
+
+  .manifesto__statement {
+    font-size: var(--text-statement);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    letter-spacing: var(--tracking-tight);
+    max-width: 32ch;
+  }
+
+  /* ── Selected projects ─────────────────────────────────── */
+  .selected__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-8);
+    flex-wrap: wrap;
+  }
+
+  .selected__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .selected__title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .selected__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+  }
+
+  /* ── Project card ──────────────────────────────────────── */
+  .project-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project-card__thumb {
+    aspect-ratio: 16 / 10;
+    background-color: color-mix(in srgb, var(--text-on-light) 8%, transparent);
+  }
+
+  .project-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+  }
+
+  .project-card__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .project-card__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+
+  .project-card__year {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .project-card__desc {
+    color: var(--muted);
+    font-size: var(--text-sm);
+  }
+
+  .project-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+  }
+
+  /* ── CTA ───────────────────────────────────────────────── */
+  .cta__panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    padding: clamp(2.5rem, 6vw, 5rem) var(--space-6);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    background-image: linear-gradient(
+      135deg,
+      var(--bg-dark-card),
+      var(--bg-dark-2)
+    );
+  }
+
+  .cta__title {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .cta__sub {
+    color: var(--muted);
+    max-width: 44ch;
+  }
+
+  .cta__panel :global(.btn) {
+    margin-top: var(--space-2);
+  }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 860px) {
+    .hero__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .hero__visual {
+      display: none;
+    }
+
+    .manifesto__inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-5);
+    }
+
+    .selected__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .selected__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

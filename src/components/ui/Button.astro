@@ -1,0 +1,105 @@
+---
+/**
+ * Button — two variants:
+ *   primary : yellow pill (Geist sentence case, or JetBrains Mono when uppercase)
+ *   link    : inline cyan text link with a trailing arrow
+ *
+ * Renders an <a> when `href` is set, otherwise a <button>.
+ * Extra attributes (target, rel, aria-*, data-*) are forwarded via ...rest.
+ */
+interface Props {
+  label: string;
+  href?: string;
+  variant?: "primary" | "link";
+  uppercase?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  label,
+  href,
+  variant = "primary",
+  uppercase = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const Element = href ? "a" : "button";
+const attrs = href ? { href } : { type: "button" as const };
+
+const classes = [
+  "btn",
+  `btn--${variant}`,
+  uppercase ? "btn--mono" : "btn--sans",
+  className,
+];
+---
+
+<Element class:list={classes} {...attrs} {...rest}>
+  <span class="btn__label">{label}</span>
+  {variant === "link" && <span class="btn__arrow" aria-hidden="true">&rarr;</span>}
+</Element>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+    transition:
+      background-color var(--transition),
+      color var(--transition),
+      border-color var(--transition);
+  }
+
+  /* Typeface is decided by the `uppercase` prop */
+  .btn--sans {
+    font-family: var(--font-sans);
+  }
+
+  .btn--mono {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-mono);
+  }
+
+  /* Primary = yellow pill. Dark text for AA contrast on the amber. */
+  .btn--primary {
+    padding: 0.85rem 1.5rem;
+    border-radius: var(--radius-pill);
+    background-color: var(--accent-yellow);
+    color: var(--text-on-light);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+  }
+
+  .btn--primary:hover {
+    background-color: var(--accent-yellow-hover);
+  }
+
+  /* Link = inline cyan text with a nudging arrow */
+  .btn--link {
+    padding: 0;
+    background: none;
+    color: var(--accent-cyan);
+    font-size: var(--text-md);
+    font-weight: var(--weight-medium);
+  }
+
+  .btn--link.btn--mono {
+    font-size: var(--text-sm);
+  }
+
+  .btn--link:hover {
+    color: var(--accent-cyan-hover);
+  }
+
+  .btn__arrow {
+    transition: transform var(--transition);
+  }
+
+  .btn--link:hover .btn__arrow {
+    transform: translateX(4px);
+  }
+</style>

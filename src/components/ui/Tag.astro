@@ -1,0 +1,85 @@
+---
+/**
+ * Tag — small JetBrains Mono pill.
+ *   default : non-interactive chip used on cards (e.g. "Branding")
+ *   filter  : interactive <button> used in the projects filter bar (Stage 3)
+ *
+ * Extra attributes (data-category, etc.) are forwarded via ...rest so the
+ * Stage 3 filter script can wire these up without a framework.
+ */
+interface Props {
+  label: string;
+  variant?: "default" | "filter";
+  active?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  label,
+  variant = "default",
+  active = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const classes = ["tag", `tag--${variant}`, active && "is-active", className];
+---
+
+{
+  variant === "filter" ? (
+    <button type="button" class:list={classes} aria-pressed={active} {...rest}>
+      {label}
+    </button>
+  ) : (
+    <span class:list={classes} {...rest}>
+      {label}
+    </span>
+  )
+}
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-mono);
+    white-space: nowrap;
+  }
+
+  /* Card chips keep their source casing (e.g. "Branding") */
+  .tag--default {
+    text-transform: none;
+  }
+
+  /* Filter pills are uppercase and interactive */
+  .tag--filter {
+    text-transform: uppercase;
+    color: var(--fg);
+    cursor: pointer;
+    transition:
+      background-color var(--transition),
+      border-color var(--transition),
+      color var(--transition);
+  }
+
+  .tag--filter:hover {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+  }
+
+  /* Active filter: cyan fill with dark text for AA contrast */
+  .tag--filter.is-active {
+    background-color: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+    color: var(--bg-dark);
+  }
+</style>

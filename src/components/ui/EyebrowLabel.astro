@@ -1,0 +1,35 @@
+---
+/**
+ * EyebrowLabel — small mono uppercase label, e.g. "01 - MANIFESTO".
+ * JetBrains Mono with the required 0.06em tracking.
+ */
+interface Props {
+  text: string;
+  theme?: "light" | "dark";
+}
+
+const { text, theme = "dark" } = Astro.props;
+---
+
+<span class:list={["eyebrow", `eyebrow--${theme}`]}>{text}</span>
+
+<style>
+  .eyebrow {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* theme drives color so the label works outside a themed section too */
+  .eyebrow--dark {
+    color: var(--text-on-dark-muted);
+  }
+
+  .eyebrow--light {
+    color: var(--text-on-light-muted);
+  }
+</style>

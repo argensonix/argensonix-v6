@@ -1,0 +1,60 @@
+---
+/**
+ * BaseLayout — the HTML shell.
+ * Owns <head> meta + global styles (which pull in tokens and @font-face).
+ * Pages compose <Header />, <main> and <Footer /> inside the slot.
+ */
+import "../../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+}
+
+const {
+  title = "Argensonix — A lab for design, media & the web",
+  description = "Argensonix is a personal digital lab: design, web, radio, writing and tools. Built slowly, carefully, and for real use. Buenos Aires.",
+  ogImage = "/img/og-default.png",
+} = Astro.props;
+
+const site = Astro.site ?? "https://argensonix.com.ar";
+const canonicalUrl = new URL(Astro.url.pathname, site);
+const ogImageUrl = new URL(ogImage, site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta name="theme-color" content="#081028" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="Argensonix" />
+    <meta property="og:image" content={ogImageUrl} />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <slot />
+  </body>
+</html>
