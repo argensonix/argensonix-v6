@@ -27,7 +27,7 @@ const toKey = (value: string) => value.toLowerCase();
 
   <main id="main-content">
     <!-- ── Intro (light neutral) ───────────────────────────── -->
-    <section class="projects-intro theme-light section--sm">
+    <section class="projects-intro theme-light">
       <div class="container projects-intro__inner">
         <div class="projects-intro__copy">
           <EyebrowLabel text="Projects" theme="light" />
@@ -80,6 +80,7 @@ const toKey = (value: string) => value.toLowerCase();
                   thumbnail={entry.data.thumbnail}
                   href={entry.data.href}
                   externalUrl={entry.data.externalUrl}
+                  size="lg"
                 />
               </li>
             ))
@@ -137,49 +138,56 @@ const toKey = (value: string) => value.toLowerCase();
 
 <style>
   /* ── Intro ─────────────────────────────────────────────── */
+  /* A bit more vertical air than the default section */
+  .projects-intro {
+    padding-block: clamp(3.5rem, 6vw, 6rem);
+  }
+
   .projects-intro__inner {
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: var(--space-8);
+    gap: var(--space-10);
     align-items: center;
   }
 
   .projects-intro__copy {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-5);
   }
 
   .projects-intro__title {
-    font-size: var(--text-3xl);
+    font-size: clamp(2.5rem, 1.6rem + 3vw, 4rem);
     font-weight: var(--weight-extrabold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
   }
 
   .projects-intro__lead {
     max-width: 52ch;
   }
 
-  /* Decorative placeholder shape */
+  /* Decorative placeholder shape — larger, with a touch more presence */
   .projects-intro__visual {
-    width: clamp(140px, 18vw, 220px);
+    width: clamp(180px, 22vw, 300px);
     aspect-ratio: 1;
     border-radius: 50%;
-    background-color: color-mix(in srgb, var(--text-on-light) 10%, transparent);
+    background-color: color-mix(in srgb, var(--text-on-light) 12%, transparent);
   }
 
   /* ── Filters ───────────────────────────────────────────── */
   .projects-filters {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-8);
+    gap: var(--space-3);
+    margin-bottom: var(--space-10);
   }
 
   /* ── Grid ──────────────────────────────────────────────── */
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-5);
+    gap: var(--space-6);
   }
 
   .projects-empty {

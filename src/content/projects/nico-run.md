@@ -2,7 +2,7 @@
 title: "nico://run"
 year: "2026"
 status: "Live"
-summary: "Running data, built on a Pi"
+summary: "A personal running data system"
 tags: ["AI", "Web"]
 categories: ["Web", "Tools"]
 entryType: "external"

@@ -60,11 +60,14 @@ const classes = ["tag", `tag--${variant}`, active && "is-active", className];
     text-transform: none;
   }
 
-  /* Filter pills are uppercase and interactive */
+  /* Filter pills are uppercase and interactive — sized as real controls */
   .tag--filter {
     text-transform: uppercase;
+    min-height: 40px;
+    padding: 0.55rem 1.1rem;
     background-color: var(--surface);
     color: var(--fg);
+    font-size: var(--text-sm);
     cursor: pointer;
     transition:
       background-color var(--transition),

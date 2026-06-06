@@ -2,7 +2,7 @@
 title: "Pacer"
 year: "2025"
 status: "Live"
-summary: "Strava to local data engine"
+summary: "Training feedback engine"
 tags: ["Data", "CLI"]
 categories: ["Tools"]
 entryType: "project"

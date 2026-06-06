@@ -15,10 +15,20 @@ interface Props {
   thumbnail?: string;
   href?: string;
   externalUrl?: string;
+  /** "lg" = more presence (taller thumb, bigger type). Used on the Projects page. */
+  size?: "md" | "lg";
 }
 
-const { title, year, summary, tags = [], thumbnail, href, externalUrl } =
-  Astro.props;
+const {
+  title,
+  year,
+  summary,
+  tags = [],
+  thumbnail,
+  href,
+  externalUrl,
+  size = "md",
+} = Astro.props;
 
 const link = externalUrl ?? href;
 const isExternal = Boolean(externalUrl);
@@ -27,7 +37,14 @@ const extraAttrs = isExternal
   : {};
 ---
 
-<article class:list={["card", "project-card", link && "project-card--link"]}>
+<article
+  class:list={[
+    "card",
+    "project-card",
+    `project-card--${size}`,
+    link && "project-card--link",
+  ]}
+>
   <div class="project-card__thumb">
     {
       thumbnail ? (
@@ -158,5 +175,28 @@ const extraAttrs = isExternal
   .project-card--link:hover {
     border-color: var(--accent-cyan);
     transform: translateY(-2px);
+  }
+
+  /* Larger variant — more presence on the Projects page */
+  .project-card--lg .project-card__thumb {
+    aspect-ratio: 4 / 3;
+    background-color: color-mix(in srgb, var(--text-on-light) 12%, transparent);
+  }
+
+  .project-card--lg .project-card__body {
+    gap: var(--space-4);
+    padding: var(--space-6);
+  }
+
+  .project-card--lg .project-card__title {
+    font-size: var(--text-xl);
+  }
+
+  .project-card--lg .project-card__summary {
+    font-size: var(--text-base);
+  }
+
+  .project-card--lg .project-card__year {
+    font-size: var(--text-sm);
   }
 </style>
