@@ -3,28 +3,29 @@ import BaseLayout from "../components/layout/BaseLayout.astro";
 import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import Button from "../components/ui/Button.astro";
-import Tag from "../components/ui/Tag.astro";
 import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
+import ProjectCard from "../components/ui/ProjectCard.astro";
+import CtaSection from "../components/sections/CtaSection.astro";
 
-// Stage 1 placeholder data — the real "Selected projects" grid is wired to the
-// content collection in a later stage. Kept inline here only to verify the
-// card surface, no-thumbnail fallback, and tag rendering.
+// Home "Selected projects" placeholder data. Kept inline (not wired to the
+// content collection) until the home gets its own stage; renders via the
+// shared ProjectCard so the projects page and home stay visually in sync.
 const placeholderProjects = [
   {
     title: "Blur FM",
-    description: "Independent online radio",
+    summary: "Independent online radio",
     year: "2011-NOW",
     tags: ["Branding", "Web"],
   },
   {
     title: "nico://run",
-    description: "Running data, built on a Pi",
+    summary: "Running data, built on a Pi",
     year: "2026",
     tags: ["AI", "Web"],
   },
   {
     title: "Aires Pulse",
-    description: "A city, in signals",
+    summary: "A city, in signals",
     year: "2026",
     tags: ["Branding", "Web"],
   },
@@ -93,21 +94,13 @@ const placeholderProjects = [
         <ul class="selected__grid" role="list">
           {
             placeholderProjects.map((project) => (
-              <li class="card project-card">
-                {/* Decorative placeholder — cards render gracefully with no thumbnail */}
-                <div class="project-card__thumb" aria-hidden="true" />
-                <div class="project-card__body">
-                  <div class="project-card__row">
-                    <h3 class="project-card__title">{project.title}</h3>
-                    <span class="project-card__year">{project.year}</span>
-                  </div>
-                  <p class="project-card__desc">{project.description}</p>
-                  <div class="project-card__tags">
-                    {project.tags.map((tag) => (
-                      <Tag label={tag} />
-                    ))}
-                  </div>
-                </div>
+              <li>
+                <ProjectCard
+                  title={project.title}
+                  year={project.year}
+                  summary={project.summary}
+                  tags={project.tags}
+                />
               </li>
             ))
           }
@@ -116,17 +109,7 @@ const placeholderProjects = [
     </section>
 
     <!-- ── CTA (dark) ──────────────────────────────────────── -->
-    <section class="cta theme-dark section">
-      <div class="container">
-        <div class="cta__panel">
-          <h2 class="cta__title">Let&rsquo;s build something useful.</h2>
-          <p class="cta__sub">
-            Design, code and media for thoughtful digital projects.
-          </p>
-          <Button label="Get in touch" href="/contact" uppercase />
-        </div>
-      </div>
-    </section>
+    <CtaSection />
   </main>
 
   <Footer />
@@ -227,86 +210,6 @@ const placeholderProjects = [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-5);
-  }
-
-  /* ── Project card ──────────────────────────────────────── */
-  .project-card {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .project-card__thumb {
-    aspect-ratio: 16 / 10;
-    background-color: color-mix(in srgb, var(--text-on-light) 8%, transparent);
-  }
-
-  .project-card__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-5);
-  }
-
-  .project-card__row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-3);
-  }
-
-  .project-card__title {
-    font-size: var(--text-lg);
-    font-weight: var(--weight-semibold);
-  }
-
-  .project-card__year {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: var(--tracking-mono);
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  .project-card__desc {
-    color: var(--muted);
-    font-size: var(--text-sm);
-  }
-
-  .project-card__tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-1);
-  }
-
-  /* ── CTA ───────────────────────────────────────────────── */
-  .cta__panel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-4);
-    padding: clamp(2.5rem, 6vw, 5rem) var(--space-6);
-    border-radius: var(--radius-lg);
-    text-align: center;
-    background-image: linear-gradient(
-      135deg,
-      var(--bg-dark-card),
-      var(--bg-dark-2)
-    );
-  }
-
-  .cta__title {
-    font-size: var(--text-3xl);
-    font-weight: var(--weight-bold);
-  }
-
-  .cta__sub {
-    color: var(--muted);
-    max-width: 44ch;
-  }
-
-  .cta__panel :global(.btn) {
-    margin-top: var(--space-2);
   }
 
   /* ── Responsive ────────────────────────────────────────── */

@@ -1,15 +1,16 @@
 ---
 title: "Blur FM"
-description: "Independent online radio"
-category: "Web"
-tags: ["Branding", "Web"]
 year: "2011-NOW"
+status: "Live"
+summary: "Independent online radio"
+tags: ["Branding", "Web"]
+categories: ["Radio", "Web"]
+entryType: "external"
+externalUrl: "https://blur.fm"
 role: "Design, code, ops"
+stack: ["AzuraCast", "Astro", "Linux"]
 featured: true
 order: 1
-cta:
-  label: "TUNE IN NOW"
-  href: "https://blur.fm"
 ---
 
 In 2009, between exams, I plugged a desktop into the wall and started

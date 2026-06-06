@@ -1,15 +1,16 @@
 ---
 title: "nico://run"
-description: "Running data, built on a Pi"
-category: "Web"
-tags: ["AI", "Web"]
 year: "2026"
+status: "Live"
+summary: "Running data, built on a Pi"
+tags: ["AI", "Web"]
+categories: ["Web", "Tools"]
+entryType: "external"
+externalUrl: "https://run.nico.ar"
 role: "Design, code, ops"
+stack: ["Astro", "TypeScript", "Raspberry Pi"]
 featured: true
 order: 2
-cta:
-  label: "OPEN PROJECT"
-  href: "https://run.nico.ar"
 ---
 
 A personal running portal: Strava activities pulled into a local pipeline,

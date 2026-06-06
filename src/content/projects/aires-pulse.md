@@ -1,10 +1,13 @@
 ---
 title: "Aires Pulse"
-description: "A city, in signals"
-category: "Web"
-tags: ["Branding", "Web"]
 year: "2026"
+status: "In progress"
+summary: "A city, in signals"
+tags: ["Branding", "Web"]
+categories: ["Experiments", "Web"]
+entryType: "project"
 role: "Design, code"
+stack: ["Astro", "D3", "Open data"]
 featured: true
 order: 3
 ---

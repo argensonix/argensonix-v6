@@ -1,0 +1,162 @@
+---
+/**
+ * ProjectCard — flat project card (no heavy shadow).
+ * Thumbnail (or graceful placeholder) + title + year + summary + tags.
+ * If a link is provided the whole card becomes clickable via a stretched link;
+ * externalUrl opens in a new tab. Filtering is handled by the parent, not here.
+ */
+import Tag from "./Tag.astro";
+
+interface Props {
+  title: string;
+  year: string;
+  summary: string;
+  tags?: string[];
+  thumbnail?: string;
+  href?: string;
+  externalUrl?: string;
+}
+
+const { title, year, summary, tags = [], thumbnail, href, externalUrl } =
+  Astro.props;
+
+const link = externalUrl ?? href;
+const isExternal = Boolean(externalUrl);
+const extraAttrs = isExternal
+  ? { target: "_blank", rel: "noopener noreferrer" }
+  : {};
+---
+
+<article class:list={["card", "project-card", link && "project-card--link"]}>
+  <div class="project-card__thumb">
+    {
+      thumbnail ? (
+        <img src={thumbnail} alt={title} loading="lazy" decoding="async" />
+      ) : (
+        <span class="project-card__thumb-fallback" aria-hidden="true" />
+      )
+    }
+  </div>
+
+  <div class="project-card__body">
+    <div class="project-card__row">
+      <h3 class="project-card__title">
+        {
+          link ? (
+            <a class="project-card__link" href={link} {...extraAttrs}>
+              {title}
+              {isExternal && <span class="project-card__ext" aria-hidden="true"> ↗</span>}
+            </a>
+          ) : (
+            title
+          )
+        }
+      </h3>
+      <span class="project-card__year">{year}</span>
+    </div>
+
+    <p class="project-card__summary">{summary}</p>
+
+    {
+      tags.length > 0 && (
+        <div class="project-card__tags">
+          {tags.map((tag) => (
+            <Tag label={tag} />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    transition:
+      border-color var(--transition),
+      transform var(--transition);
+  }
+
+  /* Thumbnail / placeholder */
+  .project-card__thumb {
+    aspect-ratio: 16 / 10;
+    background-color: color-mix(in srgb, var(--text-on-light) 8%, transparent);
+  }
+
+  .project-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project-card__thumb-fallback {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .project-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5);
+    flex: 1;
+  }
+
+  .project-card__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .project-card__title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+
+  .project-card__link {
+    color: inherit;
+  }
+
+  /* Stretched link: makes the whole card clickable */
+  .project-card--link .project-card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .project-card__ext {
+    color: var(--accent-cyan);
+  }
+
+  .project-card__year {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .project-card__summary {
+    color: var(--muted);
+    font-size: var(--text-sm);
+  }
+
+  .project-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: auto; /* keep tags aligned to the card bottom */
+    padding-top: var(--space-2);
+  }
+
+  /* Hover affordance only for linkable cards (no heavy shadow) */
+  .project-card--link:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-2px);
+  }
+</style>
