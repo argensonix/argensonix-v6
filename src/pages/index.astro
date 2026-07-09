@@ -1,4 +1,5 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../components/layout/BaseLayout.astro";
 import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
@@ -7,29 +8,13 @@ import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
 import ProjectCard from "../components/ui/ProjectCard.astro";
 import CtaSection from "../components/sections/CtaSection.astro";
 
-// Home "Selected projects" placeholder data. Kept inline (not wired to the
-// content collection) until the home gets its own stage; renders via the
-// shared ProjectCard so the projects page and home stay visually in sync.
-const placeholderProjects = [
-  {
-    title: "Blur FM",
-    summary: "Independent online radio",
-    year: "2011-NOW",
-    tags: ["Branding", "Web"],
-  },
-  {
-    title: "nico://run",
-    summary: "Running data, built on a Pi",
-    year: "2026",
-    tags: ["AI", "Web"],
-  },
-  {
-    title: "Aires Pulse",
-    summary: "A city, in signals",
-    year: "2026",
-    tags: ["Branding", "Web"],
-  },
-];
+// Home "Selected projects" reuses the same content collection as /projects,
+// so copy, tags and links stay in sync. Top 3 featured, by manual order.
+const featured = (
+  await getCollection("projects", ({ data }) => data.featured && !data.draft)
+)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
 ---
 
 <BaseLayout>
@@ -93,13 +78,17 @@ const placeholderProjects = [
 
         <ul class="selected__grid" role="list">
           {
-            placeholderProjects.map((project) => (
+            featured.map((entry) => (
               <li>
                 <ProjectCard
-                  title={project.title}
-                  year={project.year}
-                  summary={project.summary}
-                  tags={project.tags}
+                  title={entry.data.title}
+                  year={entry.data.year}
+                  summary={entry.data.summary}
+                  tags={entry.data.tags}
+                  thumbnail={entry.data.thumbnail}
+                  href={entry.data.href}
+                  externalUrl={entry.data.externalUrl}
+                  entryType={entry.data.entryType}
                 />
               </li>
             ))
@@ -142,10 +131,10 @@ const placeholderProjects = [
   }
 
   .hero__lead {
-    margin-top: var(--space-5);
-    max-width: 42ch;
-    font-size: var(--text-md);
-    line-height: var(--leading-relaxed);
+    margin-top: var(--space-6);
+    max-width: 46ch;
+    font-size: 1.5rem; /* ~24px — reads clearly under the large hero title */
+    line-height: 1.5;
     color: var(--muted);
   }
 
@@ -209,7 +198,7 @@ const placeholderProjects = [
   .selected__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-5);
+    gap: var(--card-gap);
   }
 
   /* ── Responsive ────────────────────────────────────────── */

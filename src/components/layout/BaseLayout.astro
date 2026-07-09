@@ -3,8 +3,15 @@
  * BaseLayout — the HTML shell.
  * Owns <head> meta + global styles (which pull in tokens) + Google Fonts.
  * Pages compose <Header />, <main> and <Footer /> inside the slot.
+ *
+ * Uses Astro's ClientRouter (View Transitions) so internal navigation swaps
+ * the document instead of full-reloading. The Blur FM player is rendered once
+ * here and marked `transition:persist`, so its <audio> survives navigation —
+ * one stream, no interruption.
  */
+import { ClientRouter } from "astro:transitions";
 import "../../styles/global.css";
+import BlurFmPlayer from "../blur-fm/BlurFmPlayer.astro";
 
 interface Props {
   title?: string;
@@ -27,7 +34,10 @@ const ogImageUrl = new URL(ogImage, site);
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
 
     <!-- Fonts: Geist + JetBrains Mono via Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -36,6 +46,8 @@ const ogImageUrl = new URL(ogImage, site);
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     />
+
+    <ClientRouter />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -64,5 +76,6 @@ const ogImageUrl = new URL(ogImage, site);
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <slot />
+    <BlurFmPlayer />
   </body>
 </html>

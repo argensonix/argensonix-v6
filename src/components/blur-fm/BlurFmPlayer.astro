@@ -1,0 +1,168 @@
+---
+/**
+ * BlurFmPlayer — the single, persistent home of the audio element and the
+ * mobile bottom mini-player. Rendered ONCE in BaseLayout and marked
+ * `transition:persist`, so the same <audio> survives client-side navigation
+ * (no duplicate streams, no interruption).
+ *
+ * The mini-player is visible only on mobile, and only after the user has
+ * pressed play (the controller toggles `.is-active` on [data-blurfm-root]).
+ */
+import { blurFm } from "../../config/blur-fm";
+import PlayPauseGlyph from "./PlayPauseGlyph.astro";
+import NowPlayingMarquee from "./NowPlayingMarquee.astro";
+---
+
+<div class="blurfm" transition:persist="blur-fm">
+  <!-- Mobile mini-player: hidden until playback starts, mobile breakpoint only. -->
+  <div class="mini" data-blurfm-root>
+    <button
+      class="mini__toggle"
+      type="button"
+      data-blurfm-toggle
+      data-state="paused"
+      aria-pressed="false"
+      aria-label="Play Blur FM"
+    >
+      <PlayPauseGlyph size={18} />
+    </button>
+
+    <div class="mini__body">
+      <span class="mini__station">
+        <span class="mini__dot" aria-hidden="true"></span>
+        {blurFm.stationName}
+      </span>
+      <!-- Wrapper owned by this component so its scoped style applies. -->
+      <div class="mini__now">
+        <NowPlayingMarquee />
+      </div>
+    </div>
+
+    <button
+      class="mini__close"
+      type="button"
+      data-blurfm-stop
+      aria-label="Stop and close Blur FM"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          d="M6 6l12 12M18 6L6 18"
+        />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Single audio element. No autoplay: src is set on the first user gesture. -->
+  <audio class="blurfm__audio" data-blurfm-audio preload="none"></audio>
+</div>
+
+<script>
+  import { initBlurFm } from "../../scripts/blur-fm/player";
+  initBlurFm();
+</script>
+
+<style>
+  .blurfm__audio {
+    display: none;
+  }
+
+  .mini {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    display: none; /* shown on mobile via .is-active below */
+    align-items: center;
+    gap: var(--space-3);
+    height: 56px;
+    padding-inline: var(--space-4);
+    /* Respect the home-indicator / safe area. */
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: content-box;
+    border-top: 1px solid var(--border-dark);
+    background-color: color-mix(in srgb, var(--bg-dark) 92%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: var(--text-on-dark);
+  }
+
+  .mini__toggle {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--bg-dark);
+    background-color: var(--accent-cyan);
+  }
+
+  .mini__body {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    line-height: 1.2;
+  }
+
+  .mini__station {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--text-on-dark);
+  }
+
+  .mini__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-cyan);
+  }
+
+  .mini__now {
+    min-width: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    color: var(--text-on-dark-muted);
+  }
+
+  .mini__now :global(.np-marquee) {
+    width: 100%;
+  }
+
+  .mini__close {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: var(--text-on-dark-muted);
+    transition: color var(--transition);
+  }
+
+  .mini__close:hover {
+    color: var(--text-on-dark);
+  }
+
+  /* Visible only on mobile, only once playback has started. */
+  @media (max-width: 720px) {
+    .mini.is-active {
+      display: flex;
+    }
+  }
+</style>

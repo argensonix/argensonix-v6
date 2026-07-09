@@ -75,6 +75,7 @@ body {
   --fg: var(--text-on-dark);
   --muted: var(--text-on-dark-muted);
   --rule: var(--border-dark);
+  --card-border: var(--border-dark);
   --eyebrow: var(--text-on-dark-muted);
   --surface: var(--bg-dark-card);
 
@@ -127,6 +128,7 @@ b {
   --fg: var(--text-on-dark);
   --muted: var(--text-on-dark-muted);
   --rule: var(--border-dark);
+  --card-border: var(--border-dark);
   --eyebrow: var(--text-on-dark-muted);
   --surface: var(--bg-dark-card);
   background-color: var(--bg-dark);
@@ -137,6 +139,7 @@ b {
   --fg: var(--text-on-dark);
   --muted: var(--text-on-dark-muted);
   --rule: var(--border-dark);
+  --card-border: var(--border-dark);
   --eyebrow: var(--text-on-dark-muted);
   --surface: var(--bg-dark-card);
   background-color: var(--bg-dark-2);
@@ -147,6 +150,7 @@ b {
   --fg: var(--text-on-light);
   --muted: var(--text-on-light-muted);
   --rule: var(--border-light);
+  --card-border: var(--border-card);
   --eyebrow: var(--text-on-light-muted);
   --surface: #ffffff;
   background-color: var(--bg-light-blue);
@@ -157,6 +161,7 @@ b {
   --fg: var(--text-on-light);
   --muted: var(--text-on-light-muted);
   --rule: var(--border-light);
+  --card-border: var(--border-card);
   --eyebrow: var(--text-on-light-muted);
   --surface: #ffffff;
   background-color: var(--bg-light-neutral);
@@ -181,13 +186,26 @@ b {
   padding-block: clamp(2.5rem, 5vw, 4.5rem);
 }
 
-/* Generic card surface — NO elevation beyond the token whisper (design rule) */
+/* Generic card surface — one criterion for every card.
+   NO elevation beyond the token whisper (design rule); depth on interactive
+   cards comes from the hairline, a small lift and a cyan edge, never a shadow. */
 .card {
   background-color: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  transition:
+    border-color var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+/* Card-level focus: a clear ring around the whole card when a control inside it
+   (e.g. a stretched link) is focused. Drawn on the card's own border-box, so
+   the card's overflow:hidden does not clip it. */
+.card:focus-within {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
 }
 
 /* --------------------------------------------------------------------------
@@ -255,6 +273,30 @@ b {
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   Blur FM mini-player
+   The bottom mini-player is position:fixed and mobile-only. While it is active
+   (class set on <html> by the player controller) reserve room at the foot of
+   the page so it never covers footer content. Desktop is untouched.
+   -------------------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .blurfm-has-mini body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   View transitions
+   Keep Astro's ClientRouter (so internal navigation swaps the document and the
+   transition:persist Blur FM audio keeps playing) but drop the default page
+   cross-fade — navigation should read as a plain, instant switch.
+   -------------------------------------------------------------------------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
 /* --------------------------------------------------------------------------

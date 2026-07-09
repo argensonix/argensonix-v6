@@ -1,8 +1,17 @@
 ---
 /**
  * Header — sticky dark navigation bar.
+ *
+ * Desktop layout is a three-zone grid: brand (left) · nav (centered) ·
+ * Blur FM "ON AIR" pill (right). On mobile the nav + pill collapse and the
+ * right zone shows the hamburger; the mobile menu carries a "Listen to Blur FM"
+ * row so audio is reachable before the bottom mini-player exists.
+ *
  * `activePage` marks the current nav item with a cyan underline + aria-current.
  */
+import BlurFmPill from "../blur-fm/BlurFmPill.astro";
+import PlayPauseGlyph from "../blur-fm/PlayPauseGlyph.astro";
+
 interface Props {
   activePage?: "home" | "about" | "projects" | "contact";
 }
@@ -40,17 +49,21 @@ const navLinks = [
       </ul>
     </nav>
 
-    <button
-      class="header__toggle"
-      type="button"
-      aria-label="Open menu"
-      aria-expanded="false"
-      aria-controls="mobile-nav"
-    >
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+    <div class="header__right">
+      <BlurFmPill />
+
+      <button
+        class="header__toggle"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
   </div>
 
   <nav id="mobile-nav" class="mobile-nav" aria-label="Mobile" hidden>
@@ -68,15 +81,36 @@ const navLinks = [
           </li>
         ))
       }
+      <li>
+        <button
+          class="mobile-nav__listen"
+          type="button"
+          data-blurfm-toggle
+          data-state="paused"
+          aria-pressed="false"
+          aria-label="Play Blur FM"
+        >
+          <span class="mobile-nav__listen-glyph"><PlayPauseGlyph size={16} /></span>
+          <span class="mobile-nav__listen-label">
+            <span class="mobile-nav__listen-dot" aria-hidden="true"></span>
+            Listen to Blur FM
+          </span>
+        </button>
+      </li>
     </ul>
   </nav>
 </header>
 
 <script>
-  const toggle = document.querySelector<HTMLButtonElement>(".header__toggle");
-  const mobileNav = document.getElementById("mobile-nav");
+  // ClientRouter-safe: re-bind the toggle on every page load (the header is
+  // re-rendered on navigation, so listeners must be re-attached). The Escape
+  // handler is document-scoped and added once.
+  function initNav() {
+    const toggle =
+      document.querySelector<HTMLButtonElement>(".header__toggle");
+    const mobileNav = document.getElementById("mobile-nav");
+    if (!toggle || !mobileNav) return;
 
-  if (toggle && mobileNav) {
     const setOpen = (open: boolean) => {
       toggle.setAttribute("aria-expanded", String(open));
       toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
@@ -88,15 +122,26 @@ const navLinks = [
       setOpen(toggle.getAttribute("aria-expanded") !== "true");
     });
 
-    // Close on link tap or Escape
+    // Close the menu on nav-link tap (but keep it open for the Listen button).
     mobileNav.querySelectorAll("a").forEach((link) => {
       link.addEventListener("click", () => setOpen(false));
     });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") setOpen(false);
-    });
   }
+
+  document.addEventListener("astro:page-load", initNav);
+
+  // Single Escape handler — closes whichever menu is currently open.
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    const toggle = document.querySelector<HTMLButtonElement>(".header__toggle");
+    const mobileNav = document.getElementById("mobile-nav");
+    if (toggle?.getAttribute("aria-expanded") === "true" && mobileNav) {
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Open menu");
+      toggle.classList.remove("is-open");
+      mobileNav.hidden = true;
+    }
+  });
 </script>
 
 <style>
@@ -105,23 +150,33 @@ const navLinks = [
     top: 0;
     z-index: 100;
     border-bottom: 1px solid var(--border-dark);
+    /* Background comes from .theme-dark (solid) — unchanged from before. */
   }
 
   .header__inner {
-    display: flex;
+    display: grid;
+    /* Equal side columns keep the centered nav aligned to the viewport,
+       independent of the brand and pill widths. */
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
+    gap: var(--space-4);
     min-height: var(--header-height);
   }
 
   .header__logo {
     display: inline-flex;
     align-items: center;
+    justify-self: start;
   }
 
   .header__logo img {
     height: 54px;
     width: auto;
+  }
+
+  /* Centered primary nav. */
+  .header__nav {
+    justify-self: center;
   }
 
   .header__list {
@@ -153,6 +208,14 @@ const navLinks = [
     text-decoration-color: var(--accent-cyan);
     text-decoration-thickness: 2px;
     text-underline-offset: 8px;
+  }
+
+  /* Right zone: ON AIR pill (desktop) + hamburger (mobile). */
+  .header__right {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
   }
 
   /* Hamburger — hidden on desktop */
@@ -215,6 +278,58 @@ const navLinks = [
 
   .mobile-nav__link[aria-current="page"] {
     color: var(--accent-cyan);
+  }
+
+  /* "Listen to Blur FM" row in the mobile menu — same card border/radius +
+     quiet cyan-edge hover as the rest of the surface family. */
+  .mobile-nav__listen {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    background-color: color-mix(in srgb, var(--accent-cyan) 8%, transparent);
+    color: var(--text-on-dark);
+    transition:
+      border-color var(--transition),
+      background-color var(--transition);
+  }
+
+  .mobile-nav__listen:hover {
+    border-color: color-mix(in srgb, var(--accent-cyan) 40%, transparent);
+    background-color: color-mix(in srgb, var(--accent-cyan) 12%, transparent);
+  }
+
+  .mobile-nav__listen-glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: var(--bg-dark);
+    background-color: var(--accent-cyan);
+  }
+
+  .mobile-nav__listen-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+  }
+
+  .mobile-nav__listen-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--accent-cyan);
   }
 
   @media (max-width: 720px) {

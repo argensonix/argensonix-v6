@@ -1,0 +1,74 @@
+---
+/**
+ * PlayPauseGlyph — the play / pause / loading icon set shared by every
+ * Blur FM control. The parent button carries `data-state`
+ * ("paused" | "loading" | "playing"); CSS shows exactly one glyph.
+ *
+ * Decorative: the parent button owns the accessible name via aria-label.
+ */
+interface Props {
+  /** Icon edge length in px. */
+  size?: number;
+}
+
+const { size = 16 } = Astro.props;
+---
+
+<span class="glyph" aria-hidden="true" style={`--glyph-size:${size}px`}>
+  <svg class="glyph__icon glyph__play" viewBox="0 0 24 24" width={size} height={size}>
+    <path fill="currentColor" d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z" />
+  </svg>
+  <svg class="glyph__icon glyph__pause" viewBox="0 0 24 24" width={size} height={size}>
+    <path fill="currentColor" d="M7 4h3.5v16H7zM13.5 4H17v16h-3.5z" />
+  </svg>
+  <span class="glyph__icon glyph__spinner"></span>
+</span>
+
+<style>
+  .glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--glyph-size);
+    height: var(--glyph-size);
+  }
+
+  .glyph__icon {
+    display: none;
+  }
+
+  /* The parent control sets data-state; show the matching glyph. */
+  :global([data-state="paused"]) .glyph__play,
+  :global([data-state="playing"]) .glyph__pause,
+  :global([data-state="loading"]) .glyph__spinner {
+    display: block;
+  }
+
+  /* Default (no state yet) shows the play icon. */
+  :global(:not([data-state])) .glyph__play {
+    display: block;
+  }
+
+  .glyph__spinner {
+    width: calc(var(--glyph-size) - 2px);
+    height: calc(var(--glyph-size) - 2px);
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    opacity: 0.85;
+    animation: blurfm-spin 0.7s linear infinite;
+  }
+
+  @keyframes blurfm-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Reduced motion: keep a static ring instead of spinning. */
+  @media (prefers-reduced-motion: reduce) {
+    .glyph__spinner {
+      animation: none;
+    }
+  }
+</style>

@@ -17,9 +17,9 @@ const { text, theme = "dark" } = Astro.props;
   .eyebrow {
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-mono);
+    font-size: 0.9375rem; /* 15px — clearly more present than the old 12px */
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1;
   }

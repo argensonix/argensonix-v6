@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import { PROJECT_CATEGORIES } from "../content/config";
+import { PROJECT_CATEGORIES } from "../content.config";
 import BaseLayout from "../components/layout/BaseLayout.astro";
 import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
@@ -80,7 +80,7 @@ const toKey = (value: string) => value.toLowerCase();
                   thumbnail={entry.data.thumbnail}
                   href={entry.data.href}
                   externalUrl={entry.data.externalUrl}
-                  size="lg"
+                  entryType={entry.data.entryType}
                 />
               </li>
             ))
@@ -157,7 +157,7 @@ const toKey = (value: string) => value.toLowerCase();
   }
 
   .projects-intro__title {
-    font-size: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+    font-size: clamp(2.75rem, 1.8rem + 3.5vw, 4.75rem);
     font-weight: var(--weight-extrabold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tight);
@@ -187,7 +187,7 @@ const toKey = (value: string) => value.toLowerCase();
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-6);
+    gap: var(--card-gap);
   }
 
   .projects-empty {

@@ -1,0 +1,80 @@
+---
+/**
+ * NowPlayingMarquee — clipped, fading viewport for the now-playing string.
+ *
+ * Presentational only. The player controller writes the text into
+ * [data-blurfm-now] and, when the text overflows AND motion is allowed,
+ * toggles `.is-scrolling` + the --marquee-shift / --marquee-duration vars.
+ * The full string always lives in the DOM, so screen readers read it whole.
+ */
+import { blurFm } from "../../config/blur-fm";
+
+interface Props {
+  class?: string;
+  /** Accessible name for the live region. */
+  ariaLabel?: string;
+}
+
+const { class: className, ariaLabel = "Now playing on Blur FM" } = Astro.props;
+---
+
+<div
+  class:list={["np-marquee", className]}
+  data-blurfm-marquee
+  role="status"
+  aria-live="polite"
+  aria-label={ariaLabel}
+>
+  <span class="np-marquee__text" data-blurfm-now>{blurFm.defaultNowPlaying}</span>
+</div>
+
+<style>
+  .np-marquee {
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+    /* Soft fade on both edges signals the text continues. */
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 0.75rem,
+      #000 calc(100% - 0.75rem),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent 0,
+      #000 0.75rem,
+      #000 calc(100% - 0.75rem),
+      transparent 100%
+    );
+  }
+
+  .np-marquee__text {
+    display: inline-block;
+    padding-inline: 0.75rem;
+    will-change: transform;
+  }
+
+  .np-marquee.is-scrolling .np-marquee__text {
+    animation: blurfm-marquee var(--marquee-duration, 8s) ease-in-out infinite
+      alternate;
+  }
+
+  @keyframes blurfm-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(var(--marquee-shift, 0));
+    }
+  }
+
+  /* Reduced motion: never animate. The controller also skips .is-scrolling,
+     but guard here too so the keyframes can't run. */
+  @media (prefers-reduced-motion: reduce) {
+    .np-marquee.is-scrolling .np-marquee__text {
+      animation: none;
+    }
+  }
+</style>

@@ -30,6 +30,9 @@
   /* --- Color: borders / hairlines -------------------------------------- */
   --border-light: rgba(0, 0, 0, 0.08);   /* Hairlines on light surfaces */
   --border-dark: rgba(255, 255, 255, 0.1); /* Hairlines on dark surfaces */
+  /* Card edge: a hair firmer than the generic hairline so a white card still
+     defines itself on the near-white --bg-light-neutral (#f8f8f8) section. */
+  --border-card: rgba(0, 0, 0, 0.12);
 
   /* --- Typography: families -------------------------------------------- */
   /* Geist Sans: headings, body, navigation, CTA labels.
@@ -96,6 +99,14 @@
   /* --- Elevation ------------------------------------------------------- */
   /* Per design rules: cards have NO shadow, or at most this whisper. */
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  /* --- Card ------------------------------------------------------------ */
+  /* One card criterion, referenced by every card surface. Depth comes from
+     the hairline + hover lift only — never a heavier shadow (design rule). */
+  --card-radius: var(--radius);      /* 10px — all content cards */
+  --card-pad: var(--space-6);        /* Body padding — one value for every card */
+  --card-gap: var(--space-6);        /* Grid gutter between cards */
+  --card-lift: -3px;                 /* Hover translateY for interactive cards */
 
   /* --- Focus ----------------------------------------------------------- */
   --focus-ring: 2px solid var(--accent-cyan);
