@@ -1,0 +1,153 @@
+---
+/**
+ * JournalCard — article card for the Journal index and the Home "Notes from
+ * the lab" teaser. Same flat `.card` family as ProjectCard (no heavy shadow).
+ *
+ * The whole card is a stretched INTERNAL link to /journal/{slug} — journal
+ * reading happens on-site; the original nico.ar permalink is offered only as a
+ * secondary link on the detail page, not here.
+ */
+import type { JournalPost } from "../../lib/journal";
+
+interface Props {
+  post: JournalPost;
+}
+
+const { post } = Astro.props;
+const href = `/journal/${post.slug}`;
+---
+
+<article class="card journal-card">
+  <div class="journal-card__thumb">
+    {
+      post.image ? (
+        <img
+          src={post.image}
+          alt={post.imageAlt || ""}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <span class="journal-card__thumb-fallback" aria-hidden="true" />
+      )
+    }
+  </div>
+
+  <div class="journal-card__body">
+    <div class="journal-card__meta">
+      <time datetime={post.isoDate}>{post.displayDate}</time>
+      {post.terms.length > 0 && <span class="journal-card__cat">{post.terms[0]}</span>}
+    </div>
+
+    <h3 class="journal-card__title">
+      <a class="journal-card__link" href={href}><span set:html={post.titleHtml} /></a>
+    </h3>
+
+    <div class="journal-card__excerpt" set:html={post.excerptHtml} />
+  </div>
+</article>
+
+<style>
+  /* Layout only — surface, border, radius, shadow and focus ring come from the
+     shared .card base (global.css). */
+  .journal-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+  }
+
+  .journal-card__thumb {
+    aspect-ratio: 16 / 9;
+    background-color: color-mix(in srgb, var(--fg) 10%, transparent);
+  }
+
+  .journal-card__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+
+  .journal-card__thumb-fallback {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .journal-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--card-pad);
+    flex: 1;
+  }
+
+  .journal-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .journal-card__cat {
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+  }
+
+  .journal-card__title {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .journal-card__link {
+    color: inherit;
+  }
+
+  /* Stretched link makes the whole card clickable. */
+  .journal-card__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  /* The whole-card ring (.card:focus-within) is the focus indicator here. */
+  .journal-card__link:focus-visible {
+    outline: none;
+  }
+
+  .journal-card__excerpt {
+    color: var(--muted);
+    font-size: var(--text-md);
+    /* Keep teasers to a tidy few lines. */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Match ProjectCard's quiet hover: cyan edge + small lift + thumbnail zoom. */
+  .journal-card:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(var(--card-lift));
+  }
+
+  .journal-card:hover .journal-card__thumb img {
+    transform: scale(1.03);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .journal-card:hover {
+      transform: none;
+    }
+
+    .journal-card:hover .journal-card__thumb img {
+      transform: none;
+    }
+  }
+</style>

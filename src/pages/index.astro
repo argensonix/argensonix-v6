@@ -7,6 +7,8 @@ import Button from "../components/ui/Button.astro";
 import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
 import ProjectCard from "../components/ui/ProjectCard.astro";
 import CtaSection from "../components/sections/CtaSection.astro";
+import JournalCard from "../components/journal/JournalCard.astro";
+import { getJournalPosts } from "../lib/journal";
 
 // Home "Selected projects" reuses the same content collection as /projects,
 // so copy, tags and links stay in sync. Top 3 featured, by manual order.
@@ -15,6 +17,10 @@ const featured = (
 )
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3);
+
+// "Notes from the lab" — the three most recent journal entries. Cards link
+// INTERNALLY to /journal/{slug}; nico.ar is only a secondary link on the post.
+const latestNotes = (await getJournalPosts()).slice(0, 3);
 ---
 
 <BaseLayout>
@@ -95,6 +101,36 @@ const featured = (
         </ul>
       </div>
     </section>
+
+    <!-- ── Notes from the lab (dark) ───────────────────────── -->
+    {
+      latestNotes.length > 0 && (
+        <section class="notes theme-dark section">
+          <div class="container">
+            <div class="notes__head">
+              <div class="notes__heading">
+                <EyebrowLabel text="03 — Journal" />
+                <h2 class="notes__title">Notes from the lab</h2>
+              </div>
+              <Button
+                label="Read the journal"
+                href="/journal"
+                variant="link"
+                uppercase
+              />
+            </div>
+
+            <ul class="notes__grid" role="list">
+              {latestNotes.map((post) => (
+                <li>
+                  <JournalCard post={post} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
 
     <!-- ── CTA (dark) ──────────────────────────────────────── -->
     <CtaSection />
@@ -200,6 +236,34 @@ const featured = (
     gap: var(--card-gap);
   }
 
+  /* ── Notes from the lab ────────────────────────────────── */
+  /* Mirrors the Selected-projects head + grid; sits on the dark tier. */
+  .notes__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-8);
+    flex-wrap: wrap;
+  }
+
+  .notes__heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .notes__title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .notes__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--card-gap);
+  }
+
   /* ── Responsive ────────────────────────────────────────── */
   @media (max-width: 860px) {
     .hero__inner {
@@ -215,13 +279,15 @@ const featured = (
       gap: var(--space-5);
     }
 
-    .selected__grid {
+    .selected__grid,
+    .notes__grid {
       grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media (max-width: 560px) {
-    .selected__grid {
+    .selected__grid,
+    .notes__grid {
       grid-template-columns: 1fr;
     }
   }

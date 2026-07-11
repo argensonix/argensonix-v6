@@ -17,16 +17,22 @@ interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
+  /**
+   * Override the canonical URL. Defaults to this page's own URL; journal posts
+   * pass their original nico.ar permalink so the source stays authoritative.
+   */
+  canonical?: string;
 }
 
 const {
   title = "Argensonix — A lab for design, media & the web",
   description = "Argensonix is a personal digital lab: design, web, radio, writing and tools. Built with care and for real use. Buenos Aires.",
   ogImage = "/img/og-default.png",
+  canonical,
 } = Astro.props;
 
 const site = Astro.site ?? "https://argensonix.com.ar";
-const canonicalUrl = new URL(Astro.url.pathname, site);
+const canonicalUrl = canonical ?? new URL(Astro.url.pathname, site).toString();
 const ogImageUrl = new URL(ogImage, site);
 ---
 

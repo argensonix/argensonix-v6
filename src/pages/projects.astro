@@ -99,41 +99,59 @@ const toKey = (value: string) => value.toLowerCase();
 
 <script>
   // Client-side category filter — vanilla JS, no framework.
-  const buttons = Array.from(
-    document.querySelectorAll<HTMLButtonElement>(
-      ".projects-filters .tag--filter",
-    ),
-  );
-  const items = Array.from(
-    document.querySelectorAll<HTMLLIElement>(".projects-grid__item"),
-  );
-  const status = document.querySelector<HTMLElement>("[data-filter-status]");
-  const empty = document.querySelector<HTMLElement>(".projects-empty");
+  //
+  // ClientRouter-safe: bundled module scripts run once per session, so a
+  // one-shot setup would stop working after the first view-transition
+  // navigation (the DOM is swapped, but the script never re-runs). We re-bind
+  // on every `astro:page-load` (fresh DOM each navigation → no stale/orphaned
+  // listeners) and guard against double-binding the same rendered instance.
+  function initProjectFilters() {
+    const filterBar = document.querySelector<HTMLElement>(".projects-filters");
+    // No-op on any page that isn't /projects, or if already wired this render.
+    if (!filterBar || filterBar.dataset.filtersReady === "true") return;
+    filterBar.dataset.filtersReady = "true";
 
-  const applyFilter = (filter: string) => {
-    let visible = 0;
-    items.forEach((item) => {
-      const categories = (item.dataset.categories || "").split(" ");
-      const show = filter === "all" || categories.includes(filter);
-      item.hidden = !show;
-      if (show) visible += 1;
-    });
-    if (empty) empty.hidden = visible !== 0;
-    if (status) {
-      status.textContent = `Showing ${visible} project${visible === 1 ? "" : "s"}`;
-    }
-  };
+    const buttons = Array.from(
+      filterBar.querySelectorAll<HTMLButtonElement>(".tag--filter"),
+    );
+    const items = Array.from(
+      document.querySelectorAll<HTMLLIElement>(".projects-grid__item"),
+    );
+    const status = document.querySelector<HTMLElement>("[data-filter-status]");
+    const empty = document.querySelector<HTMLElement>(".projects-empty");
 
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      buttons.forEach((other) => {
-        const isActive = other === button;
-        other.classList.toggle("is-active", isActive);
-        other.setAttribute("aria-pressed", String(isActive));
+    const applyFilter = (filter: string) => {
+      let visible = 0;
+      items.forEach((item) => {
+        const categories = (item.dataset.categories || "").split(" ");
+        const show = filter === "all" || categories.includes(filter);
+        item.hidden = !show;
+        if (show) visible += 1;
       });
-      applyFilter(button.dataset.filter || "all");
+      if (empty) empty.hidden = visible !== 0;
+      if (status) {
+        status.textContent = `Showing ${visible} project${visible === 1 ? "" : "s"}`;
+      }
+    };
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        buttons.forEach((other) => {
+          const isActive = other === button;
+          other.classList.toggle("is-active", isActive);
+          other.setAttribute("aria-pressed", String(isActive));
+        });
+        applyFilter(button.dataset.filter || "all");
+      });
     });
-  });
+  }
+
+  // `astro:page-load` fires on the first load and after every client-side
+  // navigation. The direct call covers the race where this module first
+  // executes *after* that event has already fired on a fresh navigation to
+  // /projects; the `filtersReady` guard makes the pair idempotent.
+  initProjectFilters();
+  document.addEventListener("astro:page-load", initProjectFilters);
 </script>
 
 <style>

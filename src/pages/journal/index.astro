@@ -1,0 +1,136 @@
+---
+import BaseLayout from "../../components/layout/BaseLayout.astro";
+import Header from "../../components/layout/Header.astro";
+import Footer from "../../components/layout/Footer.astro";
+import EyebrowLabel from "../../components/ui/EyebrowLabel.astro";
+import CtaSection from "../../components/sections/CtaSection.astro";
+import JournalCard from "../../components/journal/JournalCard.astro";
+import { getJournalPosts } from "../../lib/journal";
+
+// All posts, newest first — fetched from the nico.ar WordPress API at build time.
+const posts = await getJournalPosts();
+---
+
+<BaseLayout
+  title="Journal — Argensonix"
+  description="Notes from the lab: writing on design, the web, radio, self-hosting and the tools in between."
+>
+  <Header />
+
+  <main id="main-content">
+    <!-- ── Intro (light neutral) ───────────────────────────── -->
+    <section class="journal-intro theme-light">
+      <div class="container journal-intro__inner">
+        <div class="journal-intro__copy">
+          <EyebrowLabel text="Journal" theme="light" />
+          <h1 class="journal-intro__title">
+            Notes from the <span class="text-cyan">lab</span>
+          </h1>
+          <p class="journal-intro__lead lead">
+            Writing on design, the web, radio, self-hosting and the tools in
+            between — kept here, mirrored from nico.ar.
+          </p>
+        </div>
+        <div class="journal-intro__visual" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- ── Article grid (light blue) ───────────────────────── -->
+    <section class="journal-list theme-light-blue section">
+      <div class="container">
+        {
+          posts.length > 0 ? (
+            <ul class="journal-grid" role="list">
+              {posts.map((post) => (
+                <li>
+                  <JournalCard post={post} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="journal-empty">No entries to show right now.</p>
+          )
+        }
+      </div>
+    </section>
+
+    <CtaSection />
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ── Intro ─────────────────────────────────────────────── */
+  .journal-intro {
+    padding-block: clamp(3.5rem, 6vw, 6rem);
+  }
+
+  .journal-intro__inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-10);
+    align-items: center;
+  }
+
+  .journal-intro__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .journal-intro__title {
+    font-size: clamp(2.75rem, 1.8rem + 3.5vw, 4.75rem);
+    font-weight: var(--weight-extrabold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .journal-intro__lead {
+    max-width: 52ch;
+  }
+
+  .journal-intro__visual {
+    width: clamp(180px, 22vw, 300px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background-color: color-mix(in srgb, var(--text-on-light) 12%, transparent);
+  }
+
+  /* ── Grid ──────────────────────────────────────────────── */
+  .journal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--card-gap);
+  }
+
+  .journal-empty {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-mono);
+    color: var(--muted);
+  }
+
+  /* ── Responsive ────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .journal-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .journal-intro__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .journal-intro__visual {
+      display: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .journal-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

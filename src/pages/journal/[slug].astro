@@ -1,0 +1,306 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../components/layout/BaseLayout.astro";
+import Header from "../../components/layout/Header.astro";
+import Footer from "../../components/layout/Footer.astro";
+import Button from "../../components/ui/Button.astro";
+import { getJournalPosts, type JournalPost } from "../../lib/journal";
+
+// One static page per published WordPress post.
+export const getStaticPaths = (async () => {
+  const posts = await getJournalPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  post: JournalPost;
+}
+
+const { post } = Astro.props;
+
+// Strip inline tags from the sanitized title for <title>/description meta.
+const plainTitle = post.titleHtml.replace(/<[^>]+>/g, "");
+const metaDescription =
+  post.excerptHtml.replace(/<[^>]+>/g, "").trim().slice(0, 160) ||
+  `${plainTitle} — from the Argensonix journal.`;
+---
+
+<BaseLayout
+  title={`${plainTitle} — Argensonix Journal`}
+  description={metaDescription}
+  canonical={post.sourceUrl}
+  ogImage={post.image ?? "/img/og-default.png"}
+>
+  <Header />
+
+  <main id="main-content">
+    <article class="post">
+      <!-- ── Post header (dark) ────────────────────────────── -->
+      <header class="post-hero theme-dark">
+        <div class="container post-hero__inner">
+          <a class="post-hero__back" href="/journal">&larr; Journal</a>
+          <div class="post-hero__meta">
+            <time datetime={post.isoDate}>{post.displayDate}</time>
+            {post.terms.length > 0 && (
+              <span class="post-hero__cats">{post.terms.join(" · ")}</span>
+            )}
+          </div>
+          <h1 class="post-hero__title" set:html={post.titleHtml} />
+        </div>
+      </header>
+
+      {
+        post.image && (
+          <div class="post-figure theme-dark">
+            <div class="container">
+              <img
+                class="post-figure__img"
+                src={post.image}
+                alt={post.imageAlt || plainTitle}
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+          </div>
+        )
+      }
+
+      <!-- ── Post body (light) ─────────────────────────────── -->
+      <div class="post-body theme-light section">
+        <div class="container">
+          <div class="prose" set:html={post.contentHtml} />
+
+          <footer class="post-foot">
+            <p class="post-foot__note">
+              Originally published on <span class="post-foot__site">nico.ar</span>.
+            </p>
+            <Button
+              label="Read on nico.ar"
+              href={post.sourceUrl}
+              variant="link"
+              target="_blank"
+              rel="noopener noreferrer"
+            />
+          </footer>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* ── Post header ───────────────────────────────────────── */
+  .post-hero {
+    padding-block: clamp(3rem, 6vw, 5.5rem) clamp(2rem, 4vw, 3.5rem);
+  }
+
+  .post-hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    max-width: 60rem;
+  }
+
+  .post-hero__back {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    transition: color var(--transition);
+  }
+
+  .post-hero__back:hover {
+    color: var(--accent-cyan-hover);
+  }
+
+  .post-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .post-hero__title {
+    font-size: clamp(2.25rem, 1.4rem + 3.2vw, 3.75rem);
+    font-weight: var(--weight-extrabold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    max-width: 20ch;
+  }
+
+  /* ── Featured image ────────────────────────────────────── */
+  .post-figure {
+    /* Sits between the dark hero and the light body; keep it on the dark tier
+       so the image reads as part of the header block. */
+    padding-bottom: clamp(2rem, 5vw, 4rem);
+  }
+
+  .post-figure__img {
+    width: 100%;
+    max-height: 30rem;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--card-border);
+  }
+
+  /* ── Prose (sanitized WordPress HTML) ──────────────────── */
+  .prose {
+    max-width: 68ch;
+    font-size: var(--text-md);
+    line-height: var(--leading-relaxed);
+    color: var(--fg);
+  }
+
+  .prose :global(> * + *) {
+    margin-top: var(--space-5);
+  }
+
+  .prose :global(h2) {
+    margin-top: var(--space-10);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .prose :global(h3) {
+    margin-top: var(--space-8);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .prose :global(h4) {
+    margin-top: var(--space-6);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+
+  .prose :global(a) {
+    color: var(--accent-cyan);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+
+  .prose :global(a:hover) {
+    color: var(--accent-cyan-hover);
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: var(--space-6);
+  }
+
+  .prose :global(li) {
+    margin-top: var(--space-2);
+  }
+
+  .prose :global(img) {
+    border-radius: var(--radius);
+    border: 1px solid var(--card-border);
+  }
+
+  .prose :global(figure) {
+    margin-block: var(--space-6);
+  }
+
+  .prose :global(figcaption) {
+    margin-top: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    color: var(--muted);
+  }
+
+  .prose :global(blockquote) {
+    padding-left: var(--space-5);
+    border-left: 3px solid var(--accent-cyan);
+    color: var(--muted);
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+  }
+
+  .prose :global(pre) {
+    padding: var(--space-5);
+    border-radius: var(--radius);
+    background-color: var(--bg-dark);
+    color: var(--text-on-dark);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
+  }
+
+  .prose :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  /* Inline code (not inside a <pre>) gets a subtle chip. */
+  .prose :global(:not(pre) > code) {
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-sm);
+    background-color: color-mix(in srgb, var(--text-on-light) 8%, transparent);
+  }
+
+  .prose :global(hr) {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin-block: var(--space-8);
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .prose :global(th),
+  .prose :global(td) {
+    padding: var(--space-3);
+    border: 1px solid var(--rule);
+    text-align: left;
+  }
+
+  .prose :global(iframe) {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+    border-radius: var(--radius);
+  }
+
+  /* ── Article footer ────────────────────────────────────── */
+  .post-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-top: var(--space-10);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--rule);
+    max-width: 68ch;
+  }
+
+  .post-foot__note {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-mono);
+    color: var(--muted);
+  }
+
+  .post-foot__site {
+    color: var(--fg);
+  }
+</style>
