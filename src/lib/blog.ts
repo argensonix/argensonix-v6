@@ -1,8 +1,8 @@
 /**
- * Journal data source — build-time bridge to the nico.ar WordPress REST API.
+ * Blog data source — build-time bridge to the nico.ar WordPress REST API.
  *
- * All journal content is fetched at build time (static output), sanitized with
- * sanitize-html, and normalized into the small `JournalPost` shape the Astro
+ * All blog content is fetched at build time (static output), sanitized with
+ * sanitize-html, and normalized into the small `BlogPost` shape the Astro
  * pages consume. Nothing here runs in the browser.
  *
  * Source of truth: https://wp.nico.ar/wp-json/wp/v2. Each post keeps a
@@ -16,8 +16,8 @@ const WP_BASE = "https://wp.nico.ar/wp-json/wp/v2";
 /** WordPress caps per_page at 100; the blog is well under that today. */
 const PER_PAGE = 100;
 
-/** Normalized post used across the Journal index, detail pages and the Home teaser. */
-export interface JournalPost {
+/** Normalized post used across the Blog index, detail pages and the Home teaser. */
+export interface BlogPost {
   id: number;
   slug: string;
   /** Plain-ish title HTML (inline formatting + entities only, tags stripped). */
@@ -133,7 +133,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
 });
 
-function normalize(post: WpPost): JournalPost {
+function normalize(post: WpPost): BlogPost {
   const media = post._embedded?.["wp:featuredmedia"]?.[0];
   const terms = (post._embedded?.["wp:term"] ?? [])
     .flat()
@@ -158,17 +158,17 @@ function normalize(post: WpPost): JournalPost {
 
 // Memoize across the build so the index, detail pages and Home teaser share a
 // single network round-trip.
-let cache: Promise<JournalPost[]> | null = null;
+let cache: Promise<BlogPost[]> | null = null;
 
-/** All published journal posts, newest first. Fetched once per build. */
-export function getJournalPosts(): Promise<JournalPost[]> {
+/** All published blog posts, newest first. Fetched once per build. */
+export function getBlogPosts(): Promise<BlogPost[]> {
   if (!cache) {
     cache = (async () => {
       const url = `${WP_BASE}/posts?per_page=${PER_PAGE}&status=publish&_embed=1&orderby=date&order=desc`;
       const res = await fetch(url);
       if (!res.ok) {
         throw new Error(
-          `Journal: WordPress API request failed (${res.status} ${res.statusText})`,
+          `Blog: WordPress API request failed (${res.status} ${res.statusText})`,
         );
       }
       const posts = (await res.json()) as WpPost[];
@@ -179,9 +179,9 @@ export function getJournalPosts(): Promise<JournalPost[]> {
 }
 
 /** A single post by slug, or undefined if it isn't published. */
-export async function getJournalPost(
+export async function getBlogPost(
   slug: string,
-): Promise<JournalPost | undefined> {
-  const posts = await getJournalPosts();
+): Promise<BlogPost | undefined> {
+  const posts = await getBlogPosts();
   return posts.find((p) => p.slug === slug);
 }

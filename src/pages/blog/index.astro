@@ -4,51 +4,52 @@ import Header from "../../components/layout/Header.astro";
 import Footer from "../../components/layout/Footer.astro";
 import EyebrowLabel from "../../components/ui/EyebrowLabel.astro";
 import CtaSection from "../../components/sections/CtaSection.astro";
-import JournalCard from "../../components/journal/JournalCard.astro";
-import { getJournalPosts } from "../../lib/journal";
+import BlogCard from "../../components/blog/BlogCard.astro";
+import { getBlogPosts } from "../../lib/blog";
 
 // All posts, newest first — fetched from the nico.ar WordPress API at build time.
-const posts = await getJournalPosts();
+const posts = await getBlogPosts();
 ---
 
 <BaseLayout
-  title="Journal — Argensonix"
+  title="Blog — Argensonix"
   description="Notes from the lab: writing on design, the web, radio, self-hosting and the tools in between."
 >
-  <Header />
+  <Header activePage="blog" />
 
   <main id="main-content">
     <!-- ── Intro (light neutral) ───────────────────────────── -->
-    <section class="journal-intro theme-light">
-      <div class="container journal-intro__inner">
-        <div class="journal-intro__copy">
-          <EyebrowLabel text="Journal" theme="light" />
-          <h1 class="journal-intro__title">
+    <section class="blog-intro theme-light">
+      <div class="container blog-intro__inner">
+        <div class="blog-intro__copy">
+          <EyebrowLabel text="Blog" theme="light" />
+          <h1 class="blog-intro__title">
             Notes from the <span class="text-cyan">lab</span>
           </h1>
-          <p class="journal-intro__lead lead">
+          <p class="blog-intro__lead lead">
             Writing on design, the web, radio, self-hosting and the tools in
-            between — kept here, mirrored from nico.ar.
+            between.
           </p>
+          <span class="blog-intro__synced">Synced from nico.ar</span>
         </div>
-        <div class="journal-intro__visual" aria-hidden="true"></div>
+        <div class="blog-intro__visual" aria-hidden="true"></div>
       </div>
     </section>
 
     <!-- ── Article grid (light blue) ───────────────────────── -->
-    <section class="journal-list theme-light-blue section">
+    <section class="blog-list theme-light-blue section">
       <div class="container">
         {
           posts.length > 0 ? (
-            <ul class="journal-grid" role="list">
+            <ul class="blog-grid" role="list">
               {posts.map((post) => (
                 <li>
-                  <JournalCard post={post} />
+                  <BlogCard post={post} />
                 </li>
               ))}
             </ul>
           ) : (
-            <p class="journal-empty">No entries to show right now.</p>
+            <p class="blog-empty">No entries to show right now.</p>
           )
         }
       </div>
@@ -62,35 +63,48 @@ const posts = await getJournalPosts();
 
 <style>
   /* ── Intro ─────────────────────────────────────────────── */
-  .journal-intro {
+  .blog-intro {
     padding-block: clamp(3.5rem, 6vw, 6rem);
   }
 
-  .journal-intro__inner {
+  .blog-intro__inner {
     display: grid;
     grid-template-columns: 1fr auto;
     gap: var(--space-10);
     align-items: center;
   }
 
-  .journal-intro__copy {
+  .blog-intro__copy {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-5);
   }
 
-  .journal-intro__title {
+  .blog-intro__title {
     font-size: clamp(2.75rem, 1.8rem + 3.5vw, 4.75rem);
     font-weight: var(--weight-extrabold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tight);
   }
 
-  .journal-intro__lead {
+  .blog-intro__lead {
     max-width: 52ch;
   }
 
-  .journal-intro__visual {
+  /* "Synced from nico.ar" pill — mono, quiet, on the light intro. */
+  .blog-intro__synced {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .blog-intro__visual {
     width: clamp(180px, 22vw, 300px);
     aspect-ratio: 1;
     border-radius: 50%;
@@ -98,13 +112,13 @@ const posts = await getJournalPosts();
   }
 
   /* ── Grid ──────────────────────────────────────────────── */
-  .journal-grid {
+  .blog-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--card-gap);
   }
 
-  .journal-empty {
+  .blog-empty {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-mono);
@@ -113,23 +127,23 @@ const posts = await getJournalPosts();
 
   /* ── Responsive ────────────────────────────────────────── */
   @media (max-width: 900px) {
-    .journal-grid {
+    .blog-grid {
       grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media (max-width: 768px) {
-    .journal-intro__inner {
+    .blog-intro__inner {
       grid-template-columns: 1fr;
     }
 
-    .journal-intro__visual {
+    .blog-intro__visual {
       display: none;
     }
   }
 
   @media (max-width: 600px) {
-    .journal-grid {
+    .blog-grid {
       grid-template-columns: 1fr;
     }
   }

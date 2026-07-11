@@ -13,14 +13,19 @@ import BlurFmPill from "../blur-fm/BlurFmPill.astro";
 import PlayPauseGlyph from "../blur-fm/PlayPauseGlyph.astro";
 
 interface Props {
-  activePage?: "home" | "about" | "projects" | "contact";
+  // "about" is kept for the still-present /about page even though it's no
+  // longer in the primary nav.
+  activePage?: "home" | "about" | "projects" | "blog" | "contact";
 }
 
 const { activePage = "home" } = Astro.props;
 
+// Primary nav: Projects / Blog / Contact. About is intentionally omitted for
+// now (its short intro lives in the Home "Behind Argensonix" module); the
+// /about page still exists but is not linked here.
 const navLinks = [
-  { key: "about", label: "About", href: "/about" },
   { key: "projects", label: "Projects", href: "/projects" },
+  { key: "blog", label: "Blog", href: "/blog" },
   { key: "contact", label: "Contact", href: "/contact" },
 ] as const;
 ---

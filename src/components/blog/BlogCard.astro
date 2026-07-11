@@ -1,24 +1,25 @@
 ---
 /**
- * JournalCard — article card for the Journal index and the Home "Notes from
- * the lab" teaser. Same flat `.card` family as ProjectCard (no heavy shadow).
+ * BlogCard — article card for the Blog index and the Home "Notes from the lab"
+ * teaser. Same flat `.card` family as ProjectCard (no heavy shadow).
  *
- * The whole card is a stretched INTERNAL link to /journal/{slug} — journal
- * reading happens on-site; the original nico.ar permalink is offered only as a
- * secondary link on the detail page, not here.
+ * The whole card is a stretched INTERNAL link to /blog/{slug} — reading happens
+ * on-site; the original nico.ar permalink is offered only as a secondary link
+ * on the detail page, not here. The "Read post" row is a non-interactive visual
+ * cue (the stretched link already covers the card).
  */
-import type { JournalPost } from "../../lib/journal";
+import type { BlogPost } from "../../lib/blog";
 
 interface Props {
-  post: JournalPost;
+  post: BlogPost;
 }
 
 const { post } = Astro.props;
-const href = `/journal/${post.slug}`;
+const href = `/blog/${post.slug}`;
 ---
 
-<article class="card journal-card">
-  <div class="journal-card__thumb">
+<article class="card blog-card">
+  <div class="blog-card__thumb">
     {
       post.image ? (
         <img
@@ -28,54 +29,58 @@ const href = `/journal/${post.slug}`;
           decoding="async"
         />
       ) : (
-        <span class="journal-card__thumb-fallback" aria-hidden="true" />
+        <span class="blog-card__thumb-fallback" aria-hidden="true" />
       )
     }
   </div>
 
-  <div class="journal-card__body">
-    <div class="journal-card__meta">
+  <div class="blog-card__body">
+    <div class="blog-card__meta">
       <time datetime={post.isoDate}>{post.displayDate}</time>
-      {post.terms.length > 0 && <span class="journal-card__cat">{post.terms[0]}</span>}
+      {post.terms.length > 0 && <span class="blog-card__cat">{post.terms[0]}</span>}
     </div>
 
-    <h3 class="journal-card__title">
-      <a class="journal-card__link" href={href}><span set:html={post.titleHtml} /></a>
+    <h3 class="blog-card__title">
+      <a class="blog-card__link" href={href}><span set:html={post.titleHtml} /></a>
     </h3>
 
-    <div class="journal-card__excerpt" set:html={post.excerptHtml} />
+    <div class="blog-card__excerpt" set:html={post.excerptHtml} />
+
+    <span class="blog-card__cta" aria-hidden="true">Read post &rarr;</span>
   </div>
 </article>
 
 <style>
   /* Layout only — surface, border, radius, shadow and focus ring come from the
      shared .card base (global.css). */
-  .journal-card {
+  .blog-card {
     display: flex;
     flex-direction: column;
     height: 100%;
     position: relative;
   }
 
-  .journal-card__thumb {
+  .blog-card__thumb {
     aspect-ratio: 16 / 9;
     background-color: color-mix(in srgb, var(--fg) 10%, transparent);
   }
 
-  .journal-card__thumb img {
+  /* Card thumbnails are uniform-size crops (grid rhythm), so cover is correct
+     here — full-size body images are handled differently on the detail page. */
+  .blog-card__thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform var(--transition-slow);
   }
 
-  .journal-card__thumb-fallback {
+  .blog-card__thumb-fallback {
     display: block;
     width: 100%;
     height: 100%;
   }
 
-  .journal-card__body {
+  .blog-card__body {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -83,7 +88,7 @@ const href = `/journal/${post.slug}`;
     flex: 1;
   }
 
-  .journal-card__meta {
+  .blog-card__meta {
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -94,34 +99,34 @@ const href = `/journal/${post.slug}`;
     color: var(--muted);
   }
 
-  .journal-card__cat {
+  .blog-card__cat {
     padding: 0.2rem 0.55rem;
     border: 1px solid var(--rule);
     border-radius: var(--radius-pill);
   }
 
-  .journal-card__title {
+  .blog-card__title {
     font-size: var(--text-xl);
     font-weight: var(--weight-bold);
   }
 
-  .journal-card__link {
+  .blog-card__link {
     color: inherit;
   }
 
   /* Stretched link makes the whole card clickable. */
-  .journal-card__link::after {
+  .blog-card__link::after {
     content: "";
     position: absolute;
     inset: 0;
   }
 
   /* The whole-card ring (.card:focus-within) is the focus indicator here. */
-  .journal-card__link:focus-visible {
+  .blog-card__link:focus-visible {
     outline: none;
   }
 
-  .journal-card__excerpt {
+  .blog-card__excerpt {
     color: var(--muted);
     font-size: var(--text-md);
     /* Keep teasers to a tidy few lines. */
@@ -131,22 +136,36 @@ const href = `/journal/${post.slug}`;
     overflow: hidden;
   }
 
+  .blog-card__cta {
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    transition: color var(--transition);
+  }
+
   /* Match ProjectCard's quiet hover: cyan edge + small lift + thumbnail zoom. */
-  .journal-card:hover {
+  .blog-card:hover {
     border-color: var(--accent-cyan);
     transform: translateY(var(--card-lift));
   }
 
-  .journal-card:hover .journal-card__thumb img {
+  .blog-card:hover .blog-card__cta {
+    color: var(--accent-cyan-hover);
+  }
+
+  .blog-card:hover .blog-card__thumb img {
     transform: scale(1.03);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .journal-card:hover {
+    .blog-card:hover {
       transform: none;
     }
 
-    .journal-card:hover .journal-card__thumb img {
+    .blog-card:hover .blog-card__thumb img {
       transform: none;
     }
   }

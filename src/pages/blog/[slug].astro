@@ -4,11 +4,11 @@ import BaseLayout from "../../components/layout/BaseLayout.astro";
 import Header from "../../components/layout/Header.astro";
 import Footer from "../../components/layout/Footer.astro";
 import Button from "../../components/ui/Button.astro";
-import { getJournalPosts, type JournalPost } from "../../lib/journal";
+import { getBlogPosts, type BlogPost } from "../../lib/blog";
 
 // One static page per published WordPress post.
 export const getStaticPaths = (async () => {
-  const posts = await getJournalPosts();
+  const posts = await getBlogPosts();
   return posts.map((post) => ({
     params: { slug: post.slug },
     props: { post },
@@ -16,7 +16,7 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 interface Props {
-  post: JournalPost;
+  post: BlogPost;
 }
 
 const { post } = Astro.props;
@@ -25,30 +25,33 @@ const { post } = Astro.props;
 const plainTitle = post.titleHtml.replace(/<[^>]+>/g, "");
 const metaDescription =
   post.excerptHtml.replace(/<[^>]+>/g, "").trim().slice(0, 160) ||
-  `${plainTitle} — from the Argensonix journal.`;
+  `${plainTitle} — from the Argensonix blog.`;
 ---
 
 <BaseLayout
-  title={`${plainTitle} — Argensonix Journal`}
+  title={`${plainTitle} — Argensonix Blog`}
   description={metaDescription}
   canonical={post.sourceUrl}
   ogImage={post.image ?? "/img/og-default.png"}
 >
-  <Header />
+  <Header activePage="blog" />
 
   <main id="main-content">
     <article class="post">
       <!-- ── Post header (dark) ────────────────────────────── -->
       <header class="post-hero theme-dark">
-        <div class="container post-hero__inner">
-          <a class="post-hero__back" href="/journal">&larr; Journal</a>
-          <div class="post-hero__meta">
-            <time datetime={post.isoDate}>{post.displayDate}</time>
-            {post.terms.length > 0 && (
-              <span class="post-hero__cats">{post.terms.join(" · ")}</span>
-            )}
+        <div class="container">
+          <div class="post__col">
+            <a class="post-hero__back" href="/blog">&larr; Blog</a>
+            <div class="post-hero__meta">
+              <time datetime={post.isoDate}>{post.displayDate}</time>
+              {post.terms.length > 0 && (
+                <span class="post-hero__cats">{post.terms.join(" · ")}</span>
+              )}
+              <span class="post-hero__synced">Synced from nico.ar</span>
+            </div>
+            <h1 class="post-hero__title" set:html={post.titleHtml} />
           </div>
-          <h1 class="post-hero__title" set:html={post.titleHtml} />
         </div>
       </header>
 
@@ -56,13 +59,15 @@ const metaDescription =
         post.image && (
           <div class="post-figure theme-dark">
             <div class="container">
-              <img
-                class="post-figure__img"
-                src={post.image}
-                alt={post.imageAlt || plainTitle}
-                loading="eager"
-                decoding="async"
-              />
+              <figure class="post__media">
+                <img
+                  class="post__media-img"
+                  src={post.image}
+                  alt={post.imageAlt || plainTitle}
+                  loading="eager"
+                  decoding="async"
+                />
+              </figure>
             </div>
           </div>
         )
@@ -71,20 +76,22 @@ const metaDescription =
       <!-- ── Post body (light) ─────────────────────────────── -->
       <div class="post-body theme-light section">
         <div class="container">
-          <div class="prose" set:html={post.contentHtml} />
+          <div class="post__col">
+            <div class="prose" set:html={post.contentHtml} />
 
-          <footer class="post-foot">
-            <p class="post-foot__note">
-              Originally published on <span class="post-foot__site">nico.ar</span>.
-            </p>
-            <Button
-              label="Read on nico.ar"
-              href={post.sourceUrl}
-              variant="link"
-              target="_blank"
-              rel="noopener noreferrer"
-            />
-          </footer>
+            <footer class="post-foot">
+              <p class="post-foot__note">
+                Originally published on <span class="post-foot__site">nico.ar</span>.
+              </p>
+              <Button
+                label="Read on nico.ar"
+                href={post.sourceUrl}
+                variant="link"
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            </footer>
+          </div>
         </div>
       </div>
     </article>
@@ -94,19 +101,22 @@ const metaDescription =
 </BaseLayout>
 
 <style>
+  /* Shared, centered reading column. The hero copy, the featured image and the
+     body all sit on the same centre axis, so nothing drifts out of alignment.
+     Reading measure ~68ch (within the 65–72ch comfortable range). */
+  .post__col {
+    max-width: 68ch;
+    margin-inline: auto;
+  }
+
   /* ── Post header ───────────────────────────────────────── */
   .post-hero {
     padding-block: clamp(3rem, 6vw, 5.5rem) clamp(2rem, 4vw, 3.5rem);
   }
 
-  .post-hero__inner {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-    max-width: 60rem;
-  }
-
   .post-hero__back {
+    display: inline-block;
+    margin-bottom: var(--space-5);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
     letter-spacing: var(--tracking-mono);
@@ -124,6 +134,7 @@ const metaDescription =
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3);
+    margin-bottom: var(--space-4);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     letter-spacing: var(--tracking-mono);
@@ -131,12 +142,18 @@ const metaDescription =
     color: var(--muted);
   }
 
+  /* Small "Synced from nico.ar" pill. */
+  .post-hero__synced {
+    padding: 0.2rem 0.55rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+  }
+
   .post-hero__title {
-    font-size: clamp(2.25rem, 1.4rem + 3.2vw, 3.75rem);
+    font-size: clamp(2.25rem, 1.4rem + 3.2vw, 3.5rem);
     font-weight: var(--weight-extrabold);
     line-height: var(--leading-tight);
     letter-spacing: var(--tracking-tight);
-    max-width: 20ch;
   }
 
   /* ── Featured image ────────────────────────────────────── */
@@ -146,17 +163,24 @@ const metaDescription =
     padding-bottom: clamp(2rem, 5vw, 4rem);
   }
 
-  .post-figure__img {
+  /* Allowed a touch wider than the reading column for a little visual weight,
+     but still centred on the same axis. */
+  .post__media {
+    max-width: 54rem;
+    margin-inline: auto;
+  }
+
+  /* Natural aspect ratio: never cropped, never stretched. */
+  .post__media-img {
+    display: block;
     width: 100%;
-    max-height: 30rem;
-    object-fit: cover;
+    height: auto;
     border-radius: var(--radius);
     border: 1px solid var(--card-border);
   }
 
   /* ── Prose (sanitized WordPress HTML) ──────────────────── */
   .prose {
-    max-width: 68ch;
     font-size: var(--text-md);
     line-height: var(--leading-relaxed);
     color: var(--fg);
@@ -205,7 +229,13 @@ const metaDescription =
     margin-top: var(--space-2);
   }
 
+  /* Body images: fit the column, keep their real proportions, never crop or
+     stretch. Small images stay their own size (left-aligned); wide ones fill
+     the measure. */
   .prose :global(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
     border-radius: var(--radius);
     border: 1px solid var(--card-border);
   }
@@ -214,12 +244,20 @@ const metaDescription =
     margin-block: var(--space-6);
   }
 
+  /* Figures may run a little wider than the text for images that deserve it,
+     while staying centred and undistorted. */
+  .prose :global(figure img) {
+    width: 100%;
+  }
+
   .prose :global(figcaption) {
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
+    line-height: var(--leading-normal);
     letter-spacing: var(--tracking-mono);
     color: var(--muted);
+    text-align: center;
   }
 
   .prose :global(blockquote) {
@@ -273,6 +311,7 @@ const metaDescription =
   }
 
   .prose :global(iframe) {
+    display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
     height: auto;
@@ -290,7 +329,6 @@ const metaDescription =
     margin-top: var(--space-10);
     padding-top: var(--space-6);
     border-top: 1px solid var(--rule);
-    max-width: 68ch;
   }
 
   .post-foot__note {

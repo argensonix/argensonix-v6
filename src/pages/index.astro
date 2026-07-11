@@ -7,8 +7,8 @@ import Button from "../components/ui/Button.astro";
 import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
 import ProjectCard from "../components/ui/ProjectCard.astro";
 import CtaSection from "../components/sections/CtaSection.astro";
-import JournalCard from "../components/journal/JournalCard.astro";
-import { getJournalPosts } from "../lib/journal";
+import BlogCard from "../components/blog/BlogCard.astro";
+import { getBlogPosts } from "../lib/blog";
 
 // Home "Selected projects" reuses the same content collection as /projects,
 // so copy, tags and links stay in sync. Top 3 featured, by manual order.
@@ -18,9 +18,9 @@ const featured = (
   .sort((a, b) => a.data.order - b.data.order)
   .slice(0, 3);
 
-// "Notes from the lab" — the three most recent journal entries. Cards link
-// INTERNALLY to /journal/{slug}; nico.ar is only a secondary link on the post.
-const latestNotes = (await getJournalPosts()).slice(0, 3);
+// "Notes from the lab" — the three most recent blog posts. Cards link
+// INTERNALLY to /blog/{slug}; nico.ar is only a secondary link on the post.
+const latestPosts = (await getBlogPosts()).slice(0, 3);
 ---
 
 <BaseLayout>
@@ -102,28 +102,46 @@ const latestNotes = (await getJournalPosts()).slice(0, 3);
       </div>
     </section>
 
-    <!-- ── Notes from the lab (dark) ───────────────────────── -->
+    <!-- ── Behind Argensonix (light blue) ──────────────────── -->
+    <section class="about theme-light-blue section">
+      <div class="container about__inner">
+        <!-- Placeholder for a personal photo / portrait image. -->
+        <div class="about__photo" aria-hidden="true"></div>
+        <div class="about__copy">
+          <EyebrowLabel text="About" theme="light" />
+          <h2 class="about__title">Behind Argensonix</h2>
+          <p class="about__lead lead">
+            Argensonix is the personal lab of Nicolás Zicarelli, a product
+            designer based in Buenos Aires. It connects design, code, radio,
+            writing and small web systems built with care and curiosity.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Notes from the lab / Blog (dark) ────────────────── -->
     {
-      latestNotes.length > 0 && (
+      latestPosts.length > 0 && (
         <section class="notes theme-dark section">
           <div class="container">
             <div class="notes__head">
               <div class="notes__heading">
-                <EyebrowLabel text="03 — Journal" />
+                <EyebrowLabel text="03 — Blog" />
                 <h2 class="notes__title">Notes from the lab</h2>
+                <span class="notes__synced">Synced from nico.ar</span>
               </div>
               <Button
-                label="Read the journal"
-                href="/journal"
+                label="Read the blog"
+                href="/blog"
                 variant="link"
                 uppercase
               />
             </div>
 
             <ul class="notes__grid" role="list">
-              {latestNotes.map((post) => (
+              {latestPosts.map((post) => (
                 <li>
-                  <JournalCard post={post} />
+                  <BlogCard post={post} />
                 </li>
               ))}
             </ul>
@@ -250,6 +268,7 @@ const latestNotes = (await getJournalPosts()).slice(0, 3);
   .notes__heading {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-3);
   }
 
@@ -258,10 +277,54 @@ const latestNotes = (await getJournalPosts()).slice(0, 3);
     font-weight: var(--weight-bold);
   }
 
+  /* "Synced from nico.ar" pill under the section heading. */
+  .notes__synced {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
   .notes__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--card-gap);
+  }
+
+  /* ── Behind Argensonix (About module) ──────────────────── */
+  /* A short, human intro — not a CV. Photo placeholder + brief copy. */
+  .about__inner {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: center;
+  }
+
+  .about__photo {
+    width: clamp(160px, 20vw, 240px);
+    aspect-ratio: 4 / 5;
+    border-radius: var(--radius-lg);
+    background-color: color-mix(in srgb, var(--text-on-light) 12%, transparent);
+    border: 1px solid var(--card-border);
+  }
+
+  .about__copy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .about__title {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .about__lead {
+    max-width: 54ch;
   }
 
   /* ── Responsive ────────────────────────────────────────── */
@@ -282,6 +345,13 @@ const latestNotes = (await getJournalPosts()).slice(0, 3);
     .selected__grid,
     .notes__grid {
       grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .about__inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
     }
   }
 
