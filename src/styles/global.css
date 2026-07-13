@@ -169,6 +169,77 @@ b {
 }
 
 /* --------------------------------------------------------------------------
+   Atmospheric dark surfaces
+   The same air the hero video sits in, extended to the section system: a very
+   low-opacity cyan bloom plus a whisper of dot texture, so dark bands read as
+   deep rather than flat. Deliberately almost imperceptible — atmosphere, not
+   decoration. Static: no animation, no filters, no JS (nothing for
+   prefers-reduced-motion to switch off).
+
+   OPT-IN, ALWAYS. This is never bundled into .theme-dark or into a shared
+   component's default classes — atmosphere applied automatically stops reading
+   as a deliberate choice and starts reading as a site-wide filter. Add it to a
+   specific section that earns it. Today: the Home hero and the Home blog band.
+
+   Two rules learned the hard way:
+   - Never anchor the bloom on an edge the page continues past (e.g. y:100% on
+     the closing band) — it pools at the seam with the next surface and reads
+     as a stain, not as depth.
+   - Never anchor it under a text column. Put it behind a heading, a corner, or
+     an opaque panel it can breathe around.
+
+   Dark surfaces only. Light sections are left clean on purpose so Manifesto,
+   Selected projects and About stay crisp and legible.
+
+   Tune per section with:
+     --atmos-x / --atmos-y  where the bloom is anchored (default: top centre)
+     --atmos-grid           dot-grid opacity; set 0 to use the bloom alone
+   -------------------------------------------------------------------------- */
+.section-atmos {
+  position: relative;
+  isolation: isolate;
+}
+
+.section-atmos::before,
+.section-atmos::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Soft cyan bloom */
+.section-atmos::before {
+  background: radial-gradient(
+    55% 65% at var(--atmos-x, 50%) var(--atmos-y, 0%),
+    color-mix(in srgb, var(--accent-cyan) 8%, transparent),
+    transparent 70%
+  );
+}
+
+/* Dot texture, dissolved around the same anchor so it never spreads across the
+   section as a technical grid or crowds the text column. */
+.section-atmos::after {
+  opacity: var(--atmos-grid, 0.5);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--accent-cyan) 12%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 26px 26px;
+  -webkit-mask: radial-gradient(
+    45% 55% at var(--atmos-x, 50%) var(--atmos-y, 0%),
+    #000,
+    transparent 72%
+  );
+  mask: radial-gradient(
+    45% 55% at var(--atmos-x, 50%) var(--atmos-y, 0%),
+    #000,
+    transparent 72%
+  );
+}
+
+/* --------------------------------------------------------------------------
    Layout primitives
    -------------------------------------------------------------------------- */
 .container {

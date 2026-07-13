@@ -8,6 +8,7 @@ import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
 import ProjectCard from "../components/ui/ProjectCard.astro";
 import CtaSection from "../components/sections/CtaSection.astro";
 import BlogCard from "../components/blog/BlogCard.astro";
+import HomeHeroMedia from "../components/home/HomeHeroMedia.astro";
 import { getBlogPosts } from "../lib/blog";
 
 // Home "Selected projects" reuses the same content collection as /projects,
@@ -28,7 +29,7 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 
   <main id="main-content">
     <!-- ── Hero (dark) ─────────────────────────────────────── -->
-    <section class="hero theme-dark">
+    <section class="hero theme-dark section-atmos">
       <div class="container hero__inner">
         <div class="hero__copy">
           <h1 class="hero__title">
@@ -43,7 +44,7 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
             <Button label="Explore projects" href="/projects" uppercase />
           </div>
         </div>
-        <div class="hero__visual" aria-hidden="true"></div>
+        <HomeHeroMedia />
       </div>
     </section>
 
@@ -122,7 +123,7 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
     <!-- ── Notes from the lab / Blog (dark) ────────────────── -->
     {
       latestPosts.length > 0 && (
-        <section class="notes theme-dark section">
+        <section class="notes theme-dark section section-atmos">
           <div class="container">
             <div class="notes__head">
               <div class="notes__heading">
@@ -161,6 +162,12 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
   /* ── Hero ──────────────────────────────────────────────── */
   .hero {
     padding-block: clamp(3rem, 7vw, 6rem);
+    /* Anchor the section bloom out on the video side, so the atmosphere around
+       the media bleeds into the masthead instead of stopping at the disc.
+       Grid is off here — HomeHeroMedia already carries its own dot texture. */
+    --atmos-x: 78%;
+    --atmos-y: 45%;
+    --atmos-grid: 0;
   }
 
   .hero__inner {
@@ -193,15 +200,6 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 
   .hero__actions {
     margin-top: var(--space-6);
-  }
-
-  /* Decorative circle placeholder for a future hero graphic */
-  .hero__visual {
-    justify-self: center;
-    width: min(100%, 360px);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background-color: color-mix(in srgb, var(--text-on-dark) 12%, transparent);
   }
 
   /* ── Manifesto ─────────────────────────────────────────── */
@@ -256,6 +254,16 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 
   /* ── Notes from the lab ────────────────────────────────── */
   /* Mirrors the Selected-projects head + grid; sits on the dark tier. */
+  .notes {
+    /* Bloom tucked into the top-left corner, behind the heading rather than
+       under the cards, so it never sits beneath body copy. The texture runs
+       below the utility default — at this size it should register as depth,
+       not as a grid you can actually resolve. */
+    --atmos-x: 14%;
+    --atmos-y: 8%;
+    --atmos-grid: 0.3;
+  }
+
   .notes__head {
     display: flex;
     align-items: flex-end;
@@ -331,10 +339,6 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
   @media (max-width: 860px) {
     .hero__inner {
       grid-template-columns: 1fr;
-    }
-
-    .hero__visual {
-      display: none;
     }
 
     .manifesto__inner {

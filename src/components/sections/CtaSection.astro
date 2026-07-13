@@ -2,6 +2,11 @@
 /**
  * CtaSection — shared closing call-to-action band (dark, gradient panel).
  * Copy defaults to the site-wide CTA; override via props if needed.
+ *
+ * The band closes on a clean dark surface by default. Section atmosphere is
+ * opt-in (`atmospheric`) rather than automatic: this component is shared by
+ * /projects and /blog, and a glow anchored in the closing band pools against
+ * the footer seam. Nothing opts in today — pass it deliberately, per page.
  */
 import Button from "../ui/Button.astro";
 
@@ -10,6 +15,8 @@ interface Props {
   text?: string;
   ctaLabel?: string;
   ctaHref?: string;
+  /** Opt in to the subtle .section-atmos bloom. Off by default. */
+  atmospheric?: boolean;
 }
 
 const {
@@ -17,10 +24,18 @@ const {
   text = "Design, code and media for thoughtful digital projects.",
   ctaLabel = "Get in touch",
   ctaHref = "/contact",
+  atmospheric = false,
 } = Astro.props;
 ---
 
-<section class="cta theme-dark section">
+<section
+  class:list={[
+    "cta",
+    "theme-dark",
+    "section",
+    atmospheric && "section-atmos",
+  ]}
+>
   <div class="container">
     <div class="cta__panel">
       <h2 class="cta__title">{title}</h2>
@@ -31,6 +46,14 @@ const {
 </section>
 
 <style>
+  /* Anchor for the opt-in bloom (only renders when `atmospheric` is passed).
+     Centred behind the panel, never at the bottom edge: a bloom anchored down
+     there pools against the footer seam and reads as a stain rather than air. */
+  .cta {
+    --atmos-x: 50%;
+    --atmos-y: 45%;
+  }
+
   /* The large closing panel — its own tier above the cards (bigger radius,
      gradient fill), but sharing the same quiet hairline for a coherent family. */
   .cta__panel {
