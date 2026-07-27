@@ -94,30 +94,43 @@ const toKey = (value: string) => value.toLowerCase();
   <Footer />
 </BaseLayout>
 
-<script>
+<script is:inline type="module" data-cfasync="false">
   // Client-side category filter — vanilla JS, no framework.
   //
-  // ClientRouter-safe: bundled module scripts run once per session, so a
+  // ClientRouter-safe: Astro only re-executes swapped-in scripts whose
+  // `type` is exactly "module" or "text/javascript" (see astro/dist/
+  // transitions/router.js `runScripts`). Cloudflare Rocket Loader (enabled
+  // on this zone) rewrites every `type="module"` it sees to a randomized
+  // `type="<hash>-module"` so it can defer execution itself — which makes
+  // Astro's re-execution check skip this script on every page fetched via
+  // ClientRouter, since the fetched HTML is rewritten the same way. A hard
+  // load still works because Rocket Loader's own loader runs the script
+  // once, but that run never happens again after a client-side navigation.
+  // `data-cfasync="false"` is Cloudflare's documented opt-out: it leaves
+  // this tag's `type` alone, so it stays a real `type="module"` that both
+  // the browser and Astro's runScripts() recognize. `is:inline` is required
+  // to keep that attribute in the output (any custom attribute forces
+  // Astro to skip processing this script), which also means no TS syntax
+  // here — plain JS only.
+  //
+  // On top of that: bundled scripts only run once per browser session, so a
   // one-shot setup would stop working after the first view-transition
-  // navigation (the DOM is swapped, but the script never re-runs). We re-bind
-  // on every `astro:page-load` (fresh DOM each navigation → no stale/orphaned
-  // listeners) and guard against double-binding the same rendered instance.
+  // navigation (the DOM is swapped, but the script never re-runs). We
+  // re-bind on every `astro:page-load` (fresh DOM each navigation → no
+  // stale/orphaned listeners) and guard against double-binding the same
+  // rendered instance.
   function initProjectFilters() {
-    const filterBar = document.querySelector<HTMLElement>(".projects-filters");
+    const filterBar = document.querySelector(".projects-filters");
     // No-op on any page that isn't /projects, or if already wired this render.
     if (!filterBar || filterBar.dataset.filtersReady === "true") return;
     filterBar.dataset.filtersReady = "true";
 
-    const buttons = Array.from(
-      filterBar.querySelectorAll<HTMLButtonElement>(".tag--filter"),
-    );
-    const items = Array.from(
-      document.querySelectorAll<HTMLLIElement>(".projects-grid__item"),
-    );
-    const status = document.querySelector<HTMLElement>("[data-filter-status]");
-    const empty = document.querySelector<HTMLElement>(".projects-empty");
+    const buttons = Array.from(filterBar.querySelectorAll(".tag--filter"));
+    const items = Array.from(document.querySelectorAll(".projects-grid__item"));
+    const status = document.querySelector("[data-filter-status]");
+    const empty = document.querySelector(".projects-empty");
 
-    const applyFilter = (filter: string) => {
+    const applyFilter = (filter) => {
       let visible = 0;
       items.forEach((item) => {
         const categories = (item.dataset.categories || "").split(" ");
