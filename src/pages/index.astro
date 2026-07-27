@@ -2,13 +2,12 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../components/layout/BaseLayout.astro";
 import Header from "../components/layout/Header.astro";
-import Footer from "../components/layout/Footer.astro";
 import Button from "../components/ui/Button.astro";
 import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
 import ProjectCard from "../components/ui/ProjectCard.astro";
-import CtaSection from "../components/sections/CtaSection.astro";
 import BlogCard from "../components/blog/BlogCard.astro";
 import HomeHeroMedia from "../components/home/HomeHeroMedia.astro";
+import HomeClosing from "../components/home/HomeClosing.astro";
 import { getBlogPosts } from "../lib/blog";
 
 // Home "Selected projects" reuses the same content collection as /projects,
@@ -106,15 +105,26 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
     <!-- ── Behind Argensonix (light blue) ──────────────────── -->
     <section class="about theme-light-blue section">
       <div class="container about__inner">
-        <!-- Placeholder for a personal photo / portrait image. -->
-        <div class="about__photo" aria-hidden="true"></div>
+        <!-- Editorial placeholder for a real portrait: a white mat around an
+             unexposed print — cool paper gradient, fine grain, one plate-mark
+             arc (the same circle motif as the hero lens and the footer seal).
+             Swap the inner span for an <img> (with alt text) once the photo
+             exists — the mat stays. -->
+        <div class="about__photo" aria-hidden="true">
+          <span class="about__photo-inner"></span>
+        </div>
         <div class="about__copy">
           <EyebrowLabel text="About" theme="light" />
           <h2 class="about__title">Behind Argensonix</h2>
           <p class="about__lead lead">
-            Argensonix is the personal lab of Nicolás Zicarelli, a product
-            designer based in Buenos Aires. It connects design, code, radio,
-            writing and small web systems built with care and curiosity.
+            I’m Nicolás Zicarelli, a product designer based in Buenos Aires.
+            Argensonix is where I connect design, code, radio, writing,
+            open-source tools and self-hosted systems — things I build with
+            care and use for real.
+          </p>
+          <p class="about__lead lead">
+            I also run long distances, which has more in common with design
+            than it seems: patience, rhythm, iteration and showing up.
           </p>
         </div>
       </div>
@@ -151,11 +161,12 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
       )
     }
 
-    <!-- ── CTA (dark) ──────────────────────────────────────── -->
-    <CtaSection />
   </main>
 
-  <Footer />
+  <!-- ── Closing (dark) ────────────────────────────────────── -->
+  <!-- Home-only poster close: CTA statement + footer merged into one band.
+       Other pages get the compact global Footer only (no large CTA). -->
+  <HomeClosing />
 </BaseLayout>
 
 <style>
@@ -167,6 +178,7 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
        Grid is off here — HomeHeroMedia already carries its own dot texture. */
     --atmos-x: 78%;
     --atmos-y: 45%;
+    --atmos-strength: 11%;
     --atmos-grid: 0;
   }
 
@@ -258,10 +270,22 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
     /* Bloom tucked into the top-left corner, behind the heading rather than
        under the cards, so it never sits beneath body copy. The texture runs
        below the utility default — at this size it should register as depth,
-       not as a grid you can actually resolve. */
+       not as a grid you can actually resolve. A fainter counter-bloom sits
+       behind the far card column so the right half of the band isn't dead
+       flat; the vertical wash (dark → dark-2 → dark) returns to --bg-dark at
+       both edges, so the seams with About and the CTA stay invisible. */
     --atmos-x: 14%;
     --atmos-y: 8%;
-    --atmos-grid: 0.3;
+    --atmos-grid: 0.35;
+    --atmos-x2: 86%;
+    --atmos-y2: 68%;
+    --atmos-strength2: 4%;
+    background-image: linear-gradient(
+      180deg,
+      var(--bg-dark) 0%,
+      var(--bg-dark-2) 55%,
+      var(--bg-dark) 100%
+    );
   }
 
   .notes__head {
@@ -312,12 +336,60 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
     align-items: center;
   }
 
+  /* White mat + hairline: the frame a printed portrait would sit in. */
   .about__photo {
     width: clamp(160px, 20vw, 240px);
     aspect-ratio: 4 / 5;
+    padding: var(--space-2);
     border-radius: var(--radius-lg);
-    background-color: color-mix(in srgb, var(--text-on-light) 12%, transparent);
+    background-color: var(--surface);
     border: 1px solid var(--card-border);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Inside the mat: an unexposed print. Cool light falls from the top-right
+     onto a paper gradient with a fine grain — abstract and quiet, clearly a
+     prepared space rather than a missing image. */
+  .about__photo-inner {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: calc(var(--radius-lg) - var(--space-2));
+    overflow: hidden;
+    background-image:
+      radial-gradient(
+        85% 70% at 74% 16%,
+        color-mix(in srgb, var(--accent-cyan) 14%, transparent),
+        transparent 64%
+      ),
+      radial-gradient(
+        color-mix(in srgb, var(--text-on-light) 5%, transparent) 1px,
+        transparent 1.4px
+      ),
+      linear-gradient(
+        168deg,
+        var(--surface) 0%,
+        color-mix(in srgb, var(--bg-light-blue) 70%, var(--surface)) 58%,
+        var(--bg-light-blue) 100%
+      );
+    background-size:
+      100% 100%,
+      5px 5px,
+      100% 100%;
+  }
+
+  /* One hairline plate-mark arc sweeping out of the lower-left corner — the
+     circle motif of the hero lens, embossed on paper. */
+  .about__photo-inner::after {
+    content: "";
+    position: absolute;
+    width: 115%;
+    aspect-ratio: 1;
+    left: -48%;
+    bottom: -52%;
+    border: 1px solid color-mix(in srgb, var(--text-on-light) 16%, transparent);
+    border-radius: 50%;
   }
 
   .about__copy {

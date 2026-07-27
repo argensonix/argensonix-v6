@@ -7,7 +7,6 @@ import Footer from "../components/layout/Footer.astro";
 import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
 import Tag from "../components/ui/Tag.astro";
 import ProjectCard from "../components/ui/ProjectCard.astro";
-import CtaSection from "../components/sections/CtaSection.astro";
 
 // Published projects, ordered by the manual `order` key
 const entries = (
@@ -90,8 +89,6 @@ const toKey = (value: string) => value.toLowerCase();
         <p class="projects-empty" hidden>No projects in this category yet.</p>
       </div>
     </section>
-
-    <CtaSection />
   </main>
 
   <Footer />

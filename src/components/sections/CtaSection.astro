@@ -1,12 +1,15 @@
 ---
 /**
- * CtaSection — shared closing call-to-action band (dark, gradient panel).
+ * CtaSection — reusable closing call-to-action band (dark, gradient panel).
  * Copy defaults to the site-wide CTA; override via props if needed.
  *
+ * Currently unused: the Home closes with HomeClosing, and internal pages
+ * (Projects/Blog) close with the compact global Footer alone. Kept available
+ * for pages that want a large CTA (e.g. a future project-detail template).
+ *
  * The band closes on a clean dark surface by default. Section atmosphere is
- * opt-in (`atmospheric`) rather than automatic: this component is shared by
- * /projects and /blog, and a glow anchored in the closing band pools against
- * the footer seam. Nothing opts in today — pass it deliberately, per page.
+ * opt-in (`atmospheric`) rather than automatic: a glow anchored in the closing
+ * band pools against the footer seam, so pass it deliberately, per page.
  */
 import Button from "../ui/Button.astro";
 
@@ -52,6 +55,10 @@ const {
   .cta {
     --atmos-x: 50%;
     --atmos-y: 45%;
+    /* The signature footer follows immediately on every page; tighten the
+       band's lower half so panel and seal read as one closing gesture
+       instead of two stranded blocks. (Scoped class outranks .section.) */
+    padding-block-end: clamp(3rem, 6vw, 5rem);
   }
 
   /* The large closing panel — its own tier above the cards (bigger radius,
@@ -65,9 +72,11 @@ const {
     border: 1px solid var(--card-border);
     border-radius: var(--radius-lg);
     text-align: center;
+    /* A whisper of cyan mixed into the light end of the gradient tips the
+       panel toward the accent without turning it into a glowing surface. */
     background-image: linear-gradient(
       135deg,
-      var(--bg-dark-card),
+      color-mix(in srgb, var(--accent-cyan) 7%, var(--bg-dark-card)),
       var(--bg-dark-2)
     );
   }

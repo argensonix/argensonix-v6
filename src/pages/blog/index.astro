@@ -3,7 +3,6 @@ import BaseLayout from "../../components/layout/BaseLayout.astro";
 import Header from "../../components/layout/Header.astro";
 import Footer from "../../components/layout/Footer.astro";
 import EyebrowLabel from "../../components/ui/EyebrowLabel.astro";
-import CtaSection from "../../components/sections/CtaSection.astro";
 import BlogCard from "../../components/blog/BlogCard.astro";
 import { getBlogPosts } from "../../lib/blog";
 
@@ -54,8 +53,6 @@ const posts = await getBlogPosts();
         }
       </div>
     </section>
-
-    <CtaSection />
   </main>
 
   <Footer />

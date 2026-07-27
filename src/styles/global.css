@@ -192,8 +192,15 @@ b {
    Selected projects and About stay crisp and legible.
 
    Tune per section with:
-     --atmos-x / --atmos-y  where the bloom is anchored (default: top centre)
-     --atmos-grid           dot-grid opacity; set 0 to use the bloom alone
+     --atmos-x / --atmos-y    where the bloom is anchored (default: top centre)
+     --atmos-strength         primary bloom intensity (default 8%)
+     --atmos-grid             dot-grid opacity; set 0 to use the bloom alone
+     --atmos-x2 / --atmos-y2  optional second, fainter counter-bloom
+     --atmos-strength2        its intensity — 0% (default) disables it entirely
+
+   The counter-bloom exists for wide bands where a single anchor leaves the
+   far side dead flat. Keep it well under the primary (≤ 5%) and follow the
+   same anchoring rules — it is a second pocket of air, not a second light.
    -------------------------------------------------------------------------- */
 .section-atmos {
   position: relative;
@@ -209,13 +216,20 @@ b {
   pointer-events: none;
 }
 
-/* Soft cyan bloom */
+/* Soft cyan bloom (+ optional counter-bloom, off until a section sets
+   --atmos-strength2 — at 0% the second layer mixes to fully transparent) */
 .section-atmos::before {
-  background: radial-gradient(
-    55% 65% at var(--atmos-x, 50%) var(--atmos-y, 0%),
-    color-mix(in srgb, var(--accent-cyan) 8%, transparent),
-    transparent 70%
-  );
+  background:
+    radial-gradient(
+      55% 65% at var(--atmos-x, 50%) var(--atmos-y, 0%),
+      color-mix(in srgb, var(--accent-cyan) var(--atmos-strength, 8%), transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 55% at var(--atmos-x2, 50%) var(--atmos-y2, 100%),
+      color-mix(in srgb, var(--accent-cyan) var(--atmos-strength2, 0%), transparent),
+      transparent 70%
+    );
 }
 
 /* Dot texture, dissolved around the same anchor so it never spreads across the
