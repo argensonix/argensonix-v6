@@ -10,6 +10,9 @@
  * one stream, no interruption.
  */
 import { ClientRouter } from "astro:transitions";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { resolve, sep } from "node:path";
 import "../../styles/global.css";
 import BlurFmPlayer from "../blur-fm/BlurFmPlayer.astro";
 
@@ -27,13 +30,39 @@ interface Props {
 const {
   title = "Argensonix — A lab for design, media & the web",
   description = "Argensonix is a personal digital lab: design, web, radio, writing and tools. Built with care and for real use. Buenos Aires.",
-  ogImage = "/img/og-default.png",
+  ogImage,
   canonical,
 } = Astro.props;
 
 const site = Astro.site ?? "https://argensonix.com.ar";
 const canonicalUrl = canonical ?? new URL(Astro.url.pathname, site).toString();
-const ogImageUrl = new URL(ogImage, site);
+const publicDir = fileURLToPath(new URL("../../../public/", import.meta.url));
+
+const resolveOgImage = (value?: string) => {
+  if (!value?.trim()) return undefined;
+
+  try {
+    const imageUrl = new URL(value, site);
+    const isLocal = imageUrl.origin === new URL(site).origin;
+
+    if (isLocal) {
+      const localPath = resolve(
+        publicDir,
+        `.${decodeURIComponent(imageUrl.pathname)}`,
+      );
+      const isInsidePublic =
+        localPath === publicDir || localPath.startsWith(`${publicDir}${sep}`);
+
+      if (!isInsidePublic || !existsSync(localPath)) return undefined;
+    }
+
+    return imageUrl.toString();
+  } catch {
+    return undefined;
+  }
+};
+
+const ogImageUrl = resolveOgImage(ogImage);
 ---
 
 <!doctype html>
@@ -71,13 +100,13 @@ const ogImageUrl = new URL(ogImage, site);
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="Argensonix" />
-    <meta property="og:image" content={ogImageUrl} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>

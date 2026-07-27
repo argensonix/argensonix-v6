@@ -4,12 +4,13 @@ year: "2009-2011"
 status: "Archived"
 summary: "The first broadcast experiment"
 tags: ["Radio", "Web"]
-categories: ["Radio", "Experiments"]
+categories: ["Radio", "Archive"]
 entryType: "archive"
 role: "Everything"
 stack: ["Icecast", "PHP"]
 featured: false
 order: 6
+draft: true
 ---
 
 <!-- Placeholder entry — copy is provisional, edit freely. -->

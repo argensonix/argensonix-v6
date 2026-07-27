@@ -10,6 +10,7 @@ role: "Design, code"
 stack: ["TypeScript", "Node"]
 featured: false
 order: 5
+draft: true
 ---
 
 <!-- Placeholder entry — copy is provisional, edit freely. -->

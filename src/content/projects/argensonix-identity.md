@@ -4,12 +4,13 @@ year: "1999-NOW"
 status: "Evolving"
 summary: "The brand system and marks"
 tags: ["Branding", "Logos"]
-categories: ["Design"]
+categories: ["Visual Design"]
 entryType: "project"
 role: "Design"
 stack: ["Illustrator", "SVG"]
 featured: false
 order: 4
+draft: true
 ---
 
 <!-- Placeholder entry — copy is provisional, edit freely. -->

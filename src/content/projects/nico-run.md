@@ -3,10 +3,10 @@ title: "nico://run"
 year: "2026"
 status: "Live"
 summary: "A personal running data system"
-tags: ["AI", "Web"]
-categories: ["Web", "Tools"]
+tags: ["Data", "Astro"]
+categories: ["Tools", "Web"]
 entryType: "external"
-externalUrl: "https://run.nico.ar"
+externalUrl: "https://run.nico.ar/"
 role: "Design, code, ops"
 stack: ["Astro", "TypeScript", "Raspberry Pi"]
 featured: true

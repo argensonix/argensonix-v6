@@ -8,10 +8,10 @@ import { glob } from "astro/loaders";
  */
 export const PROJECT_CATEGORIES = [
   "Web",
-  "Radio",
   "Tools",
-  "Design",
-  "Experiments",
+  "Radio",
+  "Visual Design",
+  "Archive",
 ] as const;
 
 /**

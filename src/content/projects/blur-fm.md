@@ -3,10 +3,10 @@ title: "Blur FM"
 year: "2011-NOW"
 status: "Live"
 summary: "Independent online radio"
-tags: ["Branding", "Web"]
-categories: ["Radio", "Web"]
+tags: ["Radio", "Streaming"]
+categories: ["Radio", "Web", "Tools"]
 entryType: "external"
-externalUrl: "https://blur.fm"
+externalUrl: "https://www.blurfm.com"
 role: "Design, code, ops"
 stack: ["AzuraCast", "Astro", "Linux"]
 featured: true

@@ -1,11 +1,12 @@
 ---
 title: "Aires Pulse"
 year: "2026"
-status: "In progress"
+status: "Live"
 summary: "A city, in signals"
-tags: ["Branding", "Web"]
-categories: ["Experiments", "Web"]
-entryType: "project"
+tags: ["Data", "Raspberry Pi"]
+categories: ["Tools", "Web"]
+entryType: "external"
+externalUrl: "https://aires.nico.ar/"
 role: "Design, code"
 stack: ["Astro", "D3", "Open data"]
 featured: true
