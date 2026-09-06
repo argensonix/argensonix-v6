@@ -58,20 +58,27 @@ const href = `/blog/${post.slug}`;
     flex-direction: column;
     height: 100%;
     position: relative;
+    transition: border-color var(--transition);
   }
 
   .blog-card__thumb {
+    position: relative;
+    width: 100%;
     aspect-ratio: 16 / 9;
+    flex: 0 0 auto;
+    overflow: hidden;
     background-color: color-mix(in srgb, var(--fg) 10%, transparent);
   }
 
   /* Card thumbnails are uniform-size crops (grid rhythm), so cover is correct
      here — full-size body images are handled differently on the detail page. */
   .blog-card__thumb img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
+    display: block;
     object-fit: cover;
-    transition: transform var(--transition-slow);
   }
 
   .blog-card__thumb-fallback {
@@ -143,30 +150,10 @@ const href = `/blog/${post.slug}`;
     letter-spacing: var(--tracking-mono);
     text-transform: uppercase;
     color: var(--accent-cyan);
-    transition: color var(--transition);
   }
 
-  /* Match ProjectCard's quiet hover: cyan edge + small lift + thumbnail zoom. */
+  /* Stationary editorial affordance: the card keeps its exact footprint. */
   .blog-card:hover {
-    border-color: var(--accent-cyan);
-    transform: translateY(var(--card-lift));
-  }
-
-  .blog-card:hover .blog-card__cta {
-    color: var(--accent-cyan-hover);
-  }
-
-  .blog-card:hover .blog-card__thumb img {
-    transform: scale(1.03);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .blog-card:hover {
-      transform: none;
-    }
-
-    .blog-card:hover .blog-card__thumb img {
-      transform: none;
-    }
+    border-color: color-mix(in srgb, var(--accent-cyan) 78%, var(--card-border));
   }
 </style>

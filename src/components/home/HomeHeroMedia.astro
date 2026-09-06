@@ -1,35 +1,11 @@
 ---
-/**
- * HomeHeroMedia — the hero masthead visual.
- *
- * A large, atmospheric masked video that reads as a "signal / window" into the
- * lab rather than a UI widget. Purely decorative: hidden from assistive tech,
- * no controls, no interaction, no JS.
- *
- * The video edge is feathered into the dark hero background (soft radial mask +
- * a vignette/navy wash overlay) so it feels blended in, not pasted on top.
- * Depth comes from atmosphere, not UI: a layered radial glow and an almost
- * imperceptible dot-grid (a restrained nod to lab.nico.ar's bg texture, faded
- * to a soft ring around the video). Accents are limited to one whisper-thin
- * ring and a single small cyan dot — no labels, coordinates, orbits or radar.
- *
- * Assets (self-hosted in /public), optimized square crops of the source clip:
- *   /home-hero.webm  · VP9, preferred
- *   /home-hero.mp4   · H.264 fallback
- *   /home-hero-poster.webp · still frame shown while loading / if video fails
- */
+/** Existing square footage becomes an edge-to-edge field. Keep the subject
+ * exposed on the right and reserve a dark printing area for the headline.
+ * The orbital line crosses the footage; it no longer outlines a container. */
 ---
 
 <div class="hero-media" aria-hidden="true">
-  {/* Faint dot-grid texture, faded to a soft ring around the video */}
-  <div class="hero-media__grid"></div>
-
-  {/* Soft atmospheric glow behind the video */}
-  <div class="hero-media__halo"></div>
-
-  {/* The masked, feathered video */}
-  <div class="hero-media__frame">
-    <span class="hero-media__fallback"></span>
+  <div class="hero-media__picture" aria-hidden="true">
     <video
       class="hero-media__video"
       autoplay
@@ -42,201 +18,109 @@
       <source src="/home-hero.webm" type="video/webm" />
       <source src="/home-hero.mp4" type="video/mp4" />
     </video>
-    {/* Vignette + navy wash: blends the disc into the dark background */}
-    <span class="hero-media__overlay"></span>
   </div>
-
-  {/* One whisper ring + a single discreet cyan accent */}
-  <div class="hero-media__ring"></div>
-  <span class="hero-media__accent"></span>
+  <div class="hero-media__graphics" aria-hidden="true">
+    <div class="hero-media__orbit"><span></span></div>
+    <div class="hero-media__ticks"></div>
+  </div>
 </div>
 
 <style>
-  /* ── Container ─────────────────────────────────────────────
-     Larger than the old placeholder so the video carries real presence in the
-     masthead, but still balanced against the headline. Children stay within
-     these bounds → no horizontal overflow. */
   .hero-media {
-    position: relative;
-    justify-self: center;
-    width: min(100%, 480px);
-    aspect-ratio: 1;
-    isolation: isolate;
-  }
-
-  /* ── Dot-grid texture ─────────────────────────────────────
-     Idea borrowed from lab.nico.ar's .bg-grid, but kept almost invisible and
-     masked to a soft annulus so it only breathes around the video — never a
-     full-hero technical grid that would compete with the headline. */
-  .hero-media__grid {
+    display: block;
     position: absolute;
     inset: 0;
-    z-index: 0;
-    background-image: radial-gradient(
-      color-mix(in srgb, var(--accent-cyan) 24%, transparent) 1px,
-      transparent 1.5px
-    );
-    background-size: 26px 26px;
-    background-position: center;
-    /* Fade the dots in a ring around the disc: gone at the core (hidden by the
-       video anyway) and dissolved before the container edge. */
-    -webkit-mask: radial-gradient(
-      circle at 50% 50%,
-      transparent 30%,
-      #000 58%,
-      transparent 90%
-    );
-    mask: radial-gradient(
-      circle at 50% 50%,
-      transparent 30%,
-      #000 58%,
-      transparent 90%
-    );
+    background: var(--bg-dark);
   }
 
-  /* ── Halo glow (layered radial-gradients, no blur filter) ──
-     Two stops give the glow depth: a tighter cyan core plus a wider, fainter
-     blue bloom that melts into the dark section. */
-  .hero-media__halo {
+  .hero-media__picture {
     position: absolute;
     inset: 0;
-    border-radius: 50%;
-    background:
-      radial-gradient(
-        circle at 50% 45%,
-        color-mix(in srgb, var(--accent-cyan) 36%, transparent),
-        transparent 54%
-      ),
-      radial-gradient(
-        circle at 50% 56%,
-        color-mix(in srgb, var(--accent-cyan) 14%, transparent),
-        transparent 84%
-      );
-    z-index: 0;
-    animation: hero-media-breathe 22s ease-in-out infinite;
-  }
-
-  /* ── The masked video frame ──────────────────────────────── */
-  .hero-media__frame {
-    position: absolute;
-    inset: 5%;
-    /* Subtle blob (not a rigid perfect circle). Also the graceful shape if the
-       soft mask below is unsupported. */
-    border-radius: 47% 53% 51% 49% / 50% 49% 51% 50%;
-    overflow: hidden;
-    z-index: 1;
-    /* Feather the edge to transparent so the disc dissolves into the dark bg
-       instead of sitting on it as a hard-edged circle. */
-    -webkit-mask: radial-gradient(circle at 50% 50%, #000 54%, transparent 88%);
-    mask: radial-gradient(circle at 50% 50%, #000 54%, transparent 88%);
-    animation: hero-media-float 11s ease-in-out infinite;
-  }
-
-  /* Fallback fill behind the video: shown if both video and poster fail, so the
-     shape is never an empty hole. Brand-toned to match the section. */
-  .hero-media__fallback {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(
-        circle at 50% 40%,
-        color-mix(in srgb, var(--accent-cyan) 20%, transparent),
-        transparent 60%
-      ),
-      var(--bg-dark-card);
+    /* One directional ink wash, no blur, glow or color grading. */
+    mask-image: linear-gradient(90deg, transparent, #000 68%);
   }
 
   .hero-media__video {
-    position: absolute;
-    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Seat the clip into the scene rather than punchy-on-top. */
-    opacity: 0.92;
+    object-position: center 52%;
   }
 
-  /* Vignette darkens the rim + a faint navy wash pulls the electric blue toward
-     the section palette, so the video reads as part of the background. */
-  .hero-media__overlay {
+  .hero-media__picture::after {
+    content: '';
     position: absolute;
     inset: 0;
+    background: linear-gradient(0deg, var(--bg-dark), transparent 75%);
+  }
+
+  .hero-media__graphics {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
     pointer-events: none;
-    background:
-      radial-gradient(
-        circle at 50% 44%,
-        transparent 42%,
-        color-mix(in srgb, var(--bg-dark) 72%, transparent) 100%
-      ),
-      linear-gradient(
-        color-mix(in srgb, var(--bg-dark) 14%, transparent),
-        color-mix(in srgb, var(--bg-dark) 26%, transparent)
-      );
   }
 
-  /* ── One whisper-thin ring around the disc ───────────────── */
-  .hero-media__ring {
+  .hero-media__orbit {
     position: absolute;
-    inset: 1.5%;
-    border: 1px solid color-mix(in srgb, var(--text-on-dark) 8%, transparent);
+    width: min(78vw, 1100px);
+    aspect-ratio: 1;
+    top: -28%;
+    right: -14%;
+    border: 1px solid color-mix(in srgb, var(--text-on-dark) 24%, transparent);
     border-radius: 50%;
-    z-index: 2;
+    animation: orbit 80s linear infinite;
   }
 
-  /* ── A single discreet cyan accent on the ring ───────────── */
-  .hero-media__accent {
+  .hero-media__orbit span {
     position: absolute;
-    top: 15%;
-    right: 12%;
-    width: 6px;
-    height: 6px;
+    left: 14.645%;
+    top: 14.645%;
+    width: var(--space-2);
+    height: var(--space-2);
+    transform: translate(-50%, -50%);
     border-radius: 50%;
-    background-color: var(--accent-cyan);
-    opacity: 0.75;
-    z-index: 3;
+    background: var(--accent-cyan);
   }
 
-  /* ── Motion (barely-there float + slow atmospheric breathe) ─ */
-  @keyframes hero-media-float {
-    0%,
-    100% {
-      transform: translateY(0);
+  .hero-media__ticks {
+    position: absolute;
+    top: var(--space-8);
+    right: max(var(--container-pad), calc((100% - var(--container-max)) / 2 + var(--container-pad)));
+    width: var(--space-16);
+    height: var(--space-3);
+    background: repeating-linear-gradient(90deg,
+      var(--text-on-dark-muted) 0 1px, transparent 1px 12px);
+  }
+
+  @keyframes orbit {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 640px) {
+    .hero-media__picture {
+      mask-image: none;
     }
-    50% {
-      transform: translateY(-4px);
+
+    .hero-media__video {
+      object-position: 62% center;
+    }
+
+    .hero-media__picture::after {
+      /* The restored copy is centered, so protect its full height on mobile. */
+      background: linear-gradient(0deg,
+        var(--bg-dark),
+        color-mix(in srgb, var(--bg-dark) 65%, transparent));
+    }
+
+    .hero-media__orbit {
+      width: 135%;
+      top: -20%;
+      right: -50%;
     }
   }
 
-  /* Very slow, near-imperceptible swell of the glow — atmosphere, not a blink. */
-  @keyframes hero-media-breathe {
-    0%,
-    100% {
-      opacity: 0.85;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 1;
-      transform: scale(1.04);
-    }
-  }
-
-  /* ── Responsive ──────────────────────────────────────────── */
-  /* Stacked under the copy by the hero grid on small screens; kept controlled
-     so it never dominates or breaks the flow. */
-  @media (max-width: 860px) {
-    .hero-media {
-      width: min(80vw, 360px);
-    }
-  }
-
-  /* ── Reduced motion ──────────────────────────────────────── */
-  /* Drop the float + glow breathe and rest at base position. The video itself
-     stays (muted, looping) as the primary, non-aggressive visual. */
   @media (prefers-reduced-motion: reduce) {
-    .hero-media__frame,
-    .hero-media__halo {
-      animation: none;
-      transform: none;
-    }
+    .hero-media__orbit { animation: none; }
   }
 </style>

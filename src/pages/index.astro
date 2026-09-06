@@ -28,12 +28,13 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 
   <main id="main-content">
     <!-- ── Hero (dark) ─────────────────────────────────────── -->
-    <section class="hero theme-dark section-atmos">
+    <section class="hero theme-dark" aria-labelledby="hero-title">
+      <HomeHeroMedia />
       <div class="container hero__inner">
         <div class="hero__copy">
-          <h1 class="hero__title">
-            A lab for <span class="text-cyan">design,</span><br />
-            media <span class="hero__amp">&amp;</span> the web.
+          <h1 class="hero__title" id="hero-title">
+            <span class="hero__opening">A lab for</span>{" "}<span class="text-cyan">design,</span><br class="hero__desktop-break" />{" "}
+            media<br class="hero__mobile-break" />{" "}<span class="hero__closing"><span class="hero__amp">&amp;</span> the web.</span>
           </h1>
           <p class="hero__lead">
             Connecting personal projects, writing, radio, tools and homegrown
@@ -43,7 +44,6 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
             <Button label="Explore projects" href="/projects" uppercase />
           </div>
         </div>
-        <HomeHeroMedia />
       </div>
     </section>
 
@@ -64,7 +64,7 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
     </section>
 
     <!-- ── Selected projects (light neutral) ───────────────── -->
-    <section class="selected theme-light section">
+    <section class="selected theme-light section" id="selected-projects">
       <div class="container">
         <div class="selected__head">
           <div class="selected__heading">
@@ -172,29 +172,27 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 <style>
   /* ── Hero ──────────────────────────────────────────────── */
   .hero {
-    padding-block: clamp(3rem, 7vw, 6rem);
-    /* Anchor the section bloom out on the video side, so the atmosphere around
-       the media bleeds into the masthead instead of stopping at the disc.
-       Grid is off here — HomeHeroMedia already carries its own dot texture. */
-    --atmos-x: 78%;
-    --atmos-y: 45%;
-    --atmos-strength: 11%;
-    --atmos-grid: 0;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
   }
 
   .hero__inner {
+    position: relative;
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1fr;
     gap: var(--space-8);
     align-items: center;
+    min-height: 650px;
+    padding-block: clamp(3rem, 7vw, 6rem);
   }
 
   .hero__title {
-    font-size: var(--text-display);
+    font-size: clamp(3.75rem, 7.3vw, 6.5rem);
     font-weight: var(--weight-extrabold);
-    line-height: 1.04;
+    line-height: 1.02;
     letter-spacing: var(--tracking-tight);
-    /* Explicit <br> controls the two-line break; don't let balance re-wrap */
+    /* Two broad lines on desktop, three connected lines on narrow screens. */
     text-wrap: normal;
   }
 
@@ -212,6 +210,35 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 
   .hero__actions {
     margin-top: var(--space-6);
+  }
+
+  .hero__closing {
+    white-space: nowrap;
+  }
+
+  .hero__mobile-break {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .hero__inner {
+      min-height: clamp(700px, 90svh, 850px);
+      padding-block: var(--space-16);
+    }
+
+    .hero__title {
+      font-size: clamp(2.5rem, 10.7vw, 4rem);
+      line-height: 1.06;
+    }
+
+    .hero__opening,
+    .hero__mobile-break {
+      display: block;
+    }
+
+    .hero__desktop-break {
+      display: none;
+    }
   }
 
   /* ── Manifesto ─────────────────────────────────────────── */
@@ -409,10 +436,6 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 
   /* ── Responsive ────────────────────────────────────────── */
   @media (max-width: 860px) {
-    .hero__inner {
-      grid-template-columns: 1fr;
-    }
-
     .manifesto__inner {
       grid-template-columns: 1fr;
       gap: var(--space-5);

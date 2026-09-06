@@ -82,13 +82,14 @@ const extraAttrs =
 </article>
 
 <style>
-  /* Layout only — surface, border, radius, shadow, transition and the
-     focus-within ring all come from the shared .card base (global.css). */
+  /* Layout only — surface, border, radius, shadow and the focus-within ring
+     all come from the shared .card base (global.css). */
   .project-card {
     display: flex;
     flex-direction: column;
     height: 100%;
     position: relative;
+    transition: border-color var(--transition);
   }
 
   /* Thumbnail / placeholder — taller 4:3 gives the cards more weight */
@@ -101,7 +102,6 @@ const extraAttrs =
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-slow);
   }
 
   .project-card__thumb-fallback {
@@ -167,25 +167,10 @@ const extraAttrs =
     margin-top: auto; /* keep tags aligned to the card bottom; body gap sets rhythm */
   }
 
-  /* Hover affordance only for linkable cards. Depth via a cyan edge + small
-     lift + a quiet thumbnail zoom — no heavy shadow (design rule). */
+  /* Hover affordance only for linkable cards. Same criterion as BlogCard:
+     a stationary cyan edge — no lift, no zoom, no tint. The card keeps its
+     exact footprint. */
   .project-card--link:hover {
-    border-color: var(--accent-cyan);
-    transform: translateY(var(--card-lift));
-  }
-
-  .project-card--link:hover .project-card__thumb img {
-    transform: scale(1.03);
-  }
-
-  /* Motion is decoration here: hold the card still when reduced motion is asked. */
-  @media (prefers-reduced-motion: reduce) {
-    .project-card--link:hover {
-      transform: none;
-    }
-
-    .project-card--link:hover .project-card__thumb img {
-      transform: none;
-    }
+    border-color: color-mix(in srgb, var(--accent-cyan) 78%, var(--card-border));
   }
 </style>
