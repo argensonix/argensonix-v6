@@ -1,22 +1,46 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../components/layout/BaseLayout.astro";
 import Header from "../components/layout/Header.astro";
 import Button from "../components/ui/Button.astro";
 import EyebrowLabel from "../components/ui/EyebrowLabel.astro";
-import ProjectCard from "../components/ui/ProjectCard.astro";
+import FeaturedProjectItem from "../components/ui/FeaturedProjectItem.astro";
 import BlogCard from "../components/blog/BlogCard.astro";
 import HomeHeroMedia from "../components/home/HomeHeroMedia.astro";
 import HomeClosing from "../components/home/HomeClosing.astro";
 import { getBlogPosts } from "../lib/blog";
 
-// Home "Selected projects" reuses the same content collection as /projects,
-// so copy, tags and links stay in sync. Top 3 featured, by manual order.
-const featured = (
-  await getCollection("projects", ({ data }) => data.featured && !data.draft)
-)
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 3);
+// Home "Selected projects" is a fixed, homepage-only lineup — independent of
+// the /projects content collection, so it can include work (Atlas, go.ar)
+// that isn't published as a full case study yet. No year or tags here by
+// design; the full detail lives on /projects.
+interface SelectedProject {
+  title: string;
+  summary: string;
+  href?: string;
+  externalUrl?: string;
+  entryType?: string;
+}
+
+const selectedProjects: SelectedProject[] = [
+  {
+    title: "Blur FM",
+    summary: "Independent online radio.",
+    externalUrl: "https://www.blurfm.com",
+    entryType: "external",
+  },
+  {
+    title: "Atlas / Banner Scheduler",
+    summary: "Automated scheduling for banner and creative delivery.",
+  },
+  {
+    title: "go.ar",
+    summary: "A personal link shortener and redirect system.",
+  },
+  {
+    title: "Selected branding",
+    summary: "Marks, wordmarks and small identity systems.",
+  },
+];
 
 // "Notes from the lab" — the three most recent blog posts. Cards link
 // INTERNALLY to /blog/{slug}; nico.ar is only a secondary link on the post.
@@ -83,17 +107,14 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
 
         <ul class="selected__grid" role="list">
           {
-            featured.map((entry) => (
+            selectedProjects.map((entry) => (
               <li>
-                <ProjectCard
-                  title={entry.data.title}
-                  year={entry.data.year}
-                  summary={entry.data.summary}
-                  tags={entry.data.tags}
-                  thumbnail={entry.data.thumbnail}
-                  href={entry.data.href}
-                  externalUrl={entry.data.externalUrl}
-                  entryType={entry.data.entryType}
+                <FeaturedProjectItem
+                  title={entry.title}
+                  summary={entry.summary}
+                  href={entry.href}
+                  externalUrl={entry.externalUrl}
+                  entryType={entry.entryType}
                 />
               </li>
             ))
@@ -285,10 +306,12 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
     font-weight: var(--weight-bold);
   }
 
+  /* 2 × 2 on desktop/tablet — all four items get equal visual weight and
+     equal image dimensions. Single column on mobile (see @media below). */
   .selected__grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--card-gap);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8) var(--card-gap);
   }
 
   /* ── Notes from the lab ────────────────────────────────── */
@@ -441,7 +464,6 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
       gap: var(--space-5);
     }
 
-    .selected__grid,
     .notes__grid {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -452,10 +474,13 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
       grid-template-columns: 1fr;
       gap: var(--space-6);
     }
+
+    .selected__grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 560px) {
-    .selected__grid,
     .notes__grid {
       grid-template-columns: 1fr;
     }

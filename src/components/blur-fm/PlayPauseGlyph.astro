@@ -37,15 +37,11 @@ const { size = 16 } = Astro.props;
     display: none;
   }
 
-  /* The parent control sets data-state; show the matching glyph. */
+  /* The parent control sets data-state (always present — every toggle ships
+     with data-state="paused" in markup); show the matching glyph only. */
   :global([data-state="paused"]) .glyph__play,
   :global([data-state="playing"]) .glyph__pause,
   :global([data-state="loading"]) .glyph__spinner {
-    display: block;
-  }
-
-  /* Default (no state yet) shows the play icon. */
-  :global(:not([data-state])) .glyph__play {
     display: block;
   }
 

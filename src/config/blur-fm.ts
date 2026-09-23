@@ -11,9 +11,6 @@
  * this file only.
  */
 export interface BlurFmConfig {
-  /** Station name shown in the pill and the mobile mini-player. */
-  stationName: string;
-
   /**
    * Public HTTPS stream mount played by the single <audio> element.
    *
@@ -46,12 +43,20 @@ export interface BlurFmConfig {
 
   /** Shown before metadata loads, when polling is disabled, or on failure. */
   defaultNowPlaying: string;
+
+  /**
+   * Fallback cover art — the official Blur FM mark, copied from the Blur FM
+   * site repo (nico.com.ar/static/img/blurfm-cover-default.svg). Shown before
+   * a track's artwork resolves, and whenever the iTunes lookup finds nothing
+   * or fails.
+   */
+  defaultArtworkUrl: string;
 }
 
 export const blurFm: BlurFmConfig = {
-  stationName: "Blur FM",
   streamUrl: "https://stream.blurfm.com/standard",
   nowPlayingUrl: "https://www.blurfm.com/icecast-proxy.php",
   nowPlayingPollMs: 15000,
   defaultNowPlaying: "Live signal from the lab",
+  defaultArtworkUrl: "/img/blurfm-cover-default.svg",
 };

@@ -21,11 +21,18 @@
  *  - [data-blurfm-root]     → the mobile mini-player container (gets .is-active)
  *  - [data-blurfm-audio]    → the persistent <audio> element
  *  - [data-blurfm-marquee]  → marquee viewport (gets .is-scrolling + CSS vars)
- *  - [data-blurfm-now]      → text node holding the now-playing string
+ *  - [data-blurfm-now]      → text node holding the combined now-playing string
+ *  - [data-blurfm-track-viewport] → clipping box around the desktop track title
+ *  - [data-blurfm-track]    → text node holding the track title alone (desktop);
+ *                             slides in place on overflow, see runTrackMarquee
+ *  - [data-blurfm-artist]   → text node holding the artist alone (desktop);
+ *                             always static, truncates with an ellipsis
+ *  - [data-blurfm-art]      → cover artwork <img> (any number of them)
  *  - data-state on toggles  → "paused" | "loading" | "playing" (drives glyphs)
  */
 import { blurFm } from "../../config/blur-fm";
 import { createNowPlayingSource, type NowPlaying } from "./now-playing";
+import { fetchArtwork } from "./artwork";
 
 interface PlayerState {
   /** User has pressed play at least once → mobile mini-player is shown. */
@@ -43,13 +50,19 @@ class BlurFmController {
     "(prefers-reduced-motion: reduce)",
   );
   private rafId = 0;
+  private artworkUrl = blurFm.defaultArtworkUrl;
+  private artworkKey = "";
+  private trackMarqueeEl: HTMLElement | null = null;
+  private trackMarqueeText = "";
+  private trackMarqueeToken = 0;
+  private trackMarqueeTimeoutId = 0;
 
   private state: PlayerState = {
     started: false,
     playing: false,
     loading: false,
     error: false,
-    nowPlaying: { text: blurFm.defaultNowPlaying, live: false },
+    nowPlaying: { text: blurFm.defaultNowPlaying, artist: "", track: "", live: false },
   };
 
   constructor() {
@@ -60,6 +73,7 @@ class BlurFmController {
     this.source.subscribe((np) => {
       this.state.nowPlaying = np;
       this.renderNowPlaying();
+      this.updateArtwork(np);
     });
     this.source.start();
 
@@ -77,6 +91,9 @@ class BlurFmController {
       if (this.rafId) return;
       this.rafId = window.requestAnimationFrame(() => {
         this.rafId = 0;
+        // Force the track marquee to re-measure against the new width even
+        // though the element/text haven't changed.
+        this.trackMarqueeText = "";
         this.renderNowPlaying();
       });
     });
@@ -204,16 +221,133 @@ class BlurFmController {
     document.documentElement.classList.toggle("blurfm-has-mini", started);
 
     this.renderNowPlaying();
+    this.applyArtwork();
   }
 
   private renderNowPlaying(): void {
-    const { text } = this.state.nowPlaying;
+    const { text, artist, track } = this.state.nowPlaying;
     document
       .querySelectorAll<HTMLElement>("[data-blurfm-now]")
       .forEach((el) => {
         if (el.textContent !== text) el.textContent = text;
         this.updateMarquee(el);
       });
+
+    // Desktop two-line layout: track/artist shown separately. Fall back to
+    // the combined string on the track line when the source couldn't be
+    // split into artist/track (e.g. the default placeholder).
+    const trackText = track || text;
+    document
+      .querySelectorAll<HTMLElement>("[data-blurfm-track]")
+      .forEach((el) => {
+        if (el.textContent !== trackText) el.textContent = trackText;
+      });
+    document
+      .querySelectorAll<HTMLElement>("[data-blurfm-artist]")
+      .forEach((el) => {
+        if (el.textContent !== artist) el.textContent = artist;
+      });
+
+    this.ensureTrackMarquee(trackText);
+  }
+
+  /**
+   * (Re)start the track-title marquee if the bound element or its text has
+   * actually changed — called on every render, but a no-op most of the time
+   * so an unchanged title never gets its animation reset mid-cycle.
+   */
+  private ensureTrackMarquee(trackText: string): void {
+    const el = document.querySelector<HTMLElement>("[data-blurfm-track]");
+    const viewport = el?.closest<HTMLElement>("[data-blurfm-track-viewport]") ?? null;
+
+    if (el === this.trackMarqueeEl && trackText === this.trackMarqueeText) return;
+    this.trackMarqueeEl = el;
+    this.trackMarqueeText = trackText;
+
+    window.clearTimeout(this.trackMarqueeTimeoutId);
+    this.trackMarqueeToken++;
+    if (!el || !viewport) return;
+
+    void this.runTrackMarquee(el, viewport, this.trackMarqueeToken);
+  }
+
+  /**
+   * Calm hold → scroll → hold → return loop for a track title that overflows
+   * its viewport. Fully static (no class, no transform) when it fits. Uses a
+   * cancellation token rather than CSS keyframes, since the hold/scroll
+   * timing needs to stay fixed regardless of how far the text overflows.
+   */
+  private async runTrackMarquee(
+    el: HTMLElement,
+    viewport: HTMLElement,
+    token: number,
+  ): Promise<void> {
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        this.trackMarqueeTimeoutId = window.setTimeout(resolve, ms);
+      });
+
+    el.style.transition = "none";
+    el.style.transform = "translateX(0)";
+    viewport.classList.remove("is-scrolling");
+
+    // Let the reset above apply before measuring true overflow.
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    if (token !== this.trackMarqueeToken) return;
+
+    const shift = el.scrollWidth - viewport.clientWidth;
+    if (shift <= 4) return; // fits — stay fully static, no fade either
+
+    // The fade mask shows even under reduced motion (a calmer cue that the
+    // title continues), but the sliding animation itself is skipped.
+    viewport.classList.add("is-scrolling");
+    if (this.reduceMotion.matches) return;
+
+    const HOLD_START_MS = 1300;
+    const HOLD_END_MS = 1000;
+    const scrollMs = Math.max(1800, (shift / 28) * 1000);
+
+    while (token === this.trackMarqueeToken) {
+      await wait(HOLD_START_MS);
+      if (token !== this.trackMarqueeToken) return;
+
+      el.style.transition = `transform ${scrollMs}ms ease-in-out`;
+      el.style.transform = `translateX(-${shift}px)`;
+      await wait(scrollMs + HOLD_END_MS);
+      if (token !== this.trackMarqueeToken) return;
+
+      el.style.transition = `transform ${scrollMs}ms ease-in-out`;
+      el.style.transform = "translateX(0)";
+      await wait(scrollMs);
+    }
+  }
+
+  /** Push the currently resolved artwork URL onto every art <img> in the DOM. */
+  private applyArtwork(): void {
+    document.querySelectorAll<HTMLImageElement>("[data-blurfm-art]").forEach((img) => {
+      if (img.getAttribute("src") !== this.artworkUrl) img.src = this.artworkUrl;
+      img.classList.add("is-ready");
+    });
+  }
+
+  /** Look up cover art for the current track; no-op if it hasn't actually changed. */
+  private updateArtwork(np: NowPlaying): void {
+    const key = `${np.artist}|${np.track}`.toLowerCase();
+    if (key === this.artworkKey) return;
+    this.artworkKey = key;
+    // Show the Blur FM mark immediately; swap it for real art if/when found.
+    this.artworkUrl = blurFm.defaultArtworkUrl;
+    this.applyArtwork();
+
+    if (!np.artist && !np.track) return;
+
+    void fetchArtwork(np.artist, np.track).then((url) => {
+      // Track may have changed again while the request was in flight.
+      if (key !== this.artworkKey) return;
+      // No result / lookup failure (fetchArtwork resolves "") → keep the fallback mark.
+      this.artworkUrl = url || blurFm.defaultArtworkUrl;
+      this.applyArtwork();
+    });
   }
 
   /** Animate a marquee only when its text actually overflows + motion is allowed. */

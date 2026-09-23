@@ -1,147 +1,238 @@
 ---
 /**
- * BlurFmPill — a small, quiet "live status" chip on the right of the desktop
- * header. Reads as a secondary signal, not a media module: a compact circular
- * play/pause button, a very small ON AIR label, and a narrow fading now-playing
- * area whose marquee only animates when the track text overflows.
+ * BlurFmPill — the compact, in-header Blur FM player. Reads as a small,
+ * intentional module that belongs to the header, not a floating media widget:
+ * cover art, a two-line track/artist stack, and a plain circular play/pause
+ * control, all held in one subtle bordered surface.
  *
- * Fixed widths keep the chip from reflowing when metadata changes. Desktop
- * only; hidden at the mobile breakpoint. State is driven by the player
- * controller via [data-blurfm-toggle] / data-state — no script of its own.
+ * Colors adapt to the header's own state: on the dark/navy header the holder
+ * stays a quiet dark card with a cyan control; on the cyan header (non-home
+ * pages, or home scrolled past the hero) it blends into the bar instead —
+ * transparent, navy text, a navy control — so it never out-contrasts the nav.
+ * The artwork itself is unchanged in both states (see BlurFmPill ancestor
+ * selectors keyed off `.header--home` / `.header--past-hero` in Header.astro).
+ *
+ * The track line scrolls in place when it overflows its width (calm
+ * hold → scroll → hold → return loop, driven by the controller — see
+ * runTrackMarquee in player.ts); it stays fully static when it fits. The
+ * artist line never animates, always just truncates with an ellipsis.
+ *
+ * Desktop only; hidden at the mobile breakpoint. State is driven by the
+ * player controller via [data-blurfm-toggle] / data-state / [data-blurfm-art]
+ * / [data-blurfm-track-viewport] / [data-blurfm-track] / [data-blurfm-artist]
+ * — no script of its own.
  */
 import PlayPauseGlyph from "./PlayPauseGlyph.astro";
-import NowPlayingMarquee from "./NowPlayingMarquee.astro";
 ---
 
-<div class="pill">
+<div class="player">
+  <div class="player__art" aria-hidden="true">
+    <img
+      class="player__art-img"
+      data-blurfm-art
+      alt=""
+      width="44"
+      height="44"
+      loading="lazy"
+    />
+  </div>
+
+  <div class="player__now" role="status" aria-live="polite" aria-label="Now playing on Blur FM">
+    <span class="player__track" data-blurfm-track-viewport>
+      <span class="player__track-text" data-blurfm-track></span>
+    </span>
+    <span class="player__artist" data-blurfm-artist></span>
+  </div>
+
   <button
-    class="pill__toggle"
+    class="player__toggle"
     type="button"
     data-blurfm-toggle
     data-state="paused"
     aria-pressed="false"
     aria-label="Play Blur FM"
   >
-    <PlayPauseGlyph size={12} />
+    <PlayPauseGlyph size={14} />
   </button>
-
-  <span class="pill__label">
-    <span class="pill__dot" aria-hidden="true"></span>
-    On Air
-  </span>
-
-  <!-- Wrapper is owned by THIS component so its scoped width/size actually
-       apply (Astro does not push a parent scope onto a child's root). -->
-  <div class="pill__now">
-    <NowPlayingMarquee />
-  </div>
 </div>
 
 <style>
-  .pill {
+  .player {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    height: 30px;
-    max-width: 260px;
-    padding-inline: var(--space-1) var(--space-3);
+    padding: var(--space-1) var(--space-2) var(--space-1) var(--space-1);
     border: 1px solid var(--border-dark);
-    border-radius: var(--radius-pill);
-    /* Preserve the original cyan controls and muted text on a dark surface. */
+    border-radius: var(--radius);
+    /* Dark-header default: a quiet dark card, close to the header's own bg. */
     background-color: var(--bg-dark);
-    transition: border-color var(--transition);
+    transition:
+      border-color var(--transition),
+      background-color var(--transition);
   }
 
-  .pill:hover {
+  .player:hover {
     border-color: color-mix(in srgb, var(--accent-cyan) 35%, transparent);
   }
 
   /* Slightly firmer border while live/loading — still subtle. */
-  .pill:has([data-state="playing"]),
-  .pill:has([data-state="loading"]) {
+  .player:has([data-state="playing"]),
+  .player:has([data-state="loading"]) {
     border-color: color-mix(in srgb, var(--accent-cyan) 40%, transparent);
   }
 
-  /* Compact circular play/pause button. */
-  .pill__toggle {
+  /* Cover art tile — a real, visible square, not a favicon. Unchanged
+     regardless of header state; it's the one constant visual accent. */
+  .player__art {
+    position: relative;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-dark-2);
+  }
+
+  .player__art-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity var(--transition-slow);
+  }
+
+  .player__art-img.is-ready {
+    opacity: 1;
+  }
+
+  /* Fixed width so the holder never reflows as metadata changes. Two-line
+     stack, vertically centered against the artwork. */
+  .player__now {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    width: clamp(100px, 9vw, 140px);
+    min-width: 0;
+  }
+
+  /* Track title — the primary line. A plain clipping viewport; the inner
+     text span is what the controller slides when the title overflows it. */
+  .player__track {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  /* Soft right-edge fade — only while genuinely overflowing (JS-toggled),
+     so short titles stay perfectly crisp with no mask at all. */
+  .player__track.is-scrolling {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(100% - 12px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to right,
+      #000 0,
+      #000 calc(100% - 12px),
+      transparent 100%
+    );
+  }
+
+  .player__track-text {
+    display: inline-block;
+    white-space: nowrap;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    line-height: 1.25;
+    color: var(--text-on-dark);
+    transition: color var(--transition);
+    will-change: transform;
+  }
+
+  /* Artist — secondary line: same size, lighter weight + lower contrast. */
+  .player__artist {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-regular);
+    line-height: 1.25;
+    color: var(--text-on-dark-muted);
+    transition: color var(--transition);
+  }
+
+  /* Plain, clear circular control — no nested-pill treatment. */
+  .player__toggle {
     flex: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    color: var(--accent-cyan);
-    background-color: color-mix(in srgb, var(--accent-cyan) 14%, transparent);
+    color: var(--bg-dark);
+    background-color: var(--accent-cyan);
     transition: background-color var(--transition);
   }
 
-  .pill__toggle:hover {
-    background-color: color-mix(in srgb, var(--accent-cyan) 24%, transparent);
+  .player__toggle:hover {
+    background-color: var(--accent-cyan-hover);
   }
 
-  .pill__label {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    font-weight: var(--weight-medium);
-    letter-spacing: var(--tracking-mono);
-    text-transform: uppercase;
-    color: var(--text-on-dark-muted);
+  /* Cyan header state (non-home pages, or home scrolled past the hero):
+     blend into the bar instead of sitting on it as a dark card — transparent
+     holder, navy text, and a navy (not cyan-on-cyan) control. */
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player {
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--text-on-light) 20%, transparent);
   }
 
-  .pill__dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--accent-cyan);
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-cyan) 55%, transparent);
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player:hover {
+    border-color: color-mix(in srgb, var(--text-on-light) 40%, transparent);
   }
 
-  /* Pulse the dot only while live. */
-  .pill:has([data-state="playing"]) .pill__dot {
-    animation: blurfm-pulse 1.8s ease-out infinite;
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player:has([data-state="playing"]),
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player:has([data-state="loading"]) {
+    border-color: color-mix(in srgb, var(--text-on-light) 50%, transparent);
   }
 
-  @keyframes blurfm-pulse {
-    0% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-cyan) 55%, transparent);
-    }
-    70% {
-      box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent-cyan) 0%, transparent);
-    }
-    100% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-cyan) 0%, transparent);
-    }
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player__track-text {
+    color: var(--text-on-light);
   }
 
-  /* Narrow, fixed overflow area — track text never widens the chip.
-     Quiet by design: small + muted so it reads as a secondary signal. */
-  .pill__now {
-    flex: none;
-    width: clamp(110px, 12vw, 150px);
-    font-family: var(--font-sans);
-    font-size: var(--text-xs);
-    color: var(--text-on-dark-muted);
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player__artist {
+    color: var(--text-on-light-muted);
   }
 
-  /* The marquee viewport fills the wrapper width set above. */
-  .pill__now :global(.np-marquee) {
-    width: 100%;
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player__toggle {
+    color: var(--accent-cyan);
+    background-color: var(--bg-dark);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .pill:has([data-state="playing"]) .pill__dot {
-      animation: none;
-    }
+  :global(:is(.header:not(.header--home), .header--home.header--past-hero))
+    .player__toggle:hover {
+    background-color: var(--bg-dark-2);
   }
 
   /* Mobile: the chip yields to the menu row + bottom mini-player. */
   @media (max-width: 720px) {
-    .pill {
+    .player {
       display: none;
     }
   }

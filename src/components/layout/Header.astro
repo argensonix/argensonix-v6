@@ -2,12 +2,17 @@
 /**
  * Header — sticky cyan navigation bar.
  *
- * Desktop layout is a three-zone grid: brand (left) · nav (centered) ·
- * Blur FM "ON AIR" pill (right). On mobile the nav + pill collapse and the
- * right zone shows the hamburger; the mobile menu carries a "Listen to Blur FM"
- * row so audio is reachable before the bottom mini-player exists.
+ * Desktop layout: brand (left) and the Blur FM player (right) sit in normal
+ * flex flow; the primary nav is absolutely centered on the header itself, so
+ * its position never depends on the width of the logo or the player. On
+ * mobile the nav + player collapse and the right zone shows the hamburger;
+ * the mobile menu carries a "Listen to Blur FM" row so audio is reachable
+ * before the bottom mini-player exists.
  *
  * `activePage` marks the current nav item with a subtle white underline + aria-current.
+ *
+ * `.header--home` / `.header--past-hero` below also key the Blur FM player's
+ * own dark-vs-cyan color adaptation (see BlurFmPill.astro's ancestor selectors).
  */
 import BlurFmPill from "../blur-fm/BlurFmPill.astro";
 import PlayPauseGlyph from "../blur-fm/PlayPauseGlyph.astro";
@@ -205,11 +210,10 @@ const navLinks = [
   }
 
   .header__inner {
-    display: grid;
-    /* Equal side columns keep the centered nav aligned to the viewport,
-       independent of the brand and pill widths. */
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    position: relative;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--space-4);
     min-height: var(--header-height);
   }
@@ -217,7 +221,6 @@ const navLinks = [
   .header__logo {
     display: inline-flex;
     align-items: center;
-    justify-self: start;
   }
 
   .header__logo img {
@@ -225,9 +228,13 @@ const navLinks = [
     width: auto;
   }
 
-  /* Centered primary nav. */
+  /* True-centered on the header, independent of the logo/player widths —
+     taken out of flow so neither side's content can push it off-center. */
   .header__nav {
-    justify-self: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .header__list {
@@ -261,9 +268,9 @@ const navLinks = [
     text-underline-offset: 8px;
   }
 
-  /* Right zone: ON AIR pill (desktop) + hamburger (mobile). */
+  /* Right zone: Blur FM player (desktop) + hamburger (mobile). */
   .header__right {
-    justify-self: end;
+    flex: none;
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
