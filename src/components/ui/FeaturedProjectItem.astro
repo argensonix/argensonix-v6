@@ -4,22 +4,19 @@
  * "Selected projects" section. Image leads, name and a single line of copy
  * sit underneath it. Deliberately not a boxed card: no border, background
  * or shadow around the item itself.
- *
- * `image` is optional — omit it to render a labeled ImagePlaceholder at the
- * same 3:2 ratio, so the grid can be evaluated before final artwork exists.
  */
-import ImagePlaceholder from "./ImagePlaceholder.astro";
-
 interface Props {
   title: string;
   summary: string;
+  image: ImageMetadata;
+  alt?: string;
   href?: string;
   externalUrl?: string;
   entryType?: string;
-  image?: string;
 }
 
-const { title, summary, href, externalUrl, entryType, image } = Astro.props;
+const { title, summary, image, alt, href, externalUrl, entryType } =
+  Astro.props;
 
 const link = externalUrl ?? href;
 const isExternal = entryType === "external" || Boolean(externalUrl);
@@ -29,13 +26,14 @@ const extraAttrs =
 
 <article class="featured-project">
   <div class="featured-project__media">
-    {
-      image ? (
-        <img src={image} alt={title} loading="lazy" decoding="async" />
-      ) : (
-        <ImagePlaceholder label={title} />
-      )
-    }
+    <img
+      src={image.src}
+      width={image.width}
+      height={image.height}
+      alt={alt ?? title}
+      loading="lazy"
+      decoding="async"
+    />
   </div>
 
   <div class="featured-project__body">
@@ -62,10 +60,14 @@ const extraAttrs =
     gap: var(--space-4);
   }
 
+  .featured-project__media {
+    aspect-ratio: 3 / 2;
+  }
+
   .featured-project__media img {
     display: block;
     width: 100%;
-    aspect-ratio: 3 / 2;
+    height: 100%;
     object-fit: cover;
   }
 

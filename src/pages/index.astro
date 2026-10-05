@@ -7,7 +7,13 @@ import FeaturedProjectItem from "../components/ui/FeaturedProjectItem.astro";
 import BlogCard from "../components/blog/BlogCard.astro";
 import HomeHeroMedia from "../components/home/HomeHeroMedia.astro";
 import HomeClosing from "../components/home/HomeClosing.astro";
+import PhotoStrip from "../components/home/PhotoStrip.astro";
 import { getBlogPosts } from "../lib/blog";
+import { getPhotoStripItems } from "../lib/lodelnico";
+import imgBlurFm from "../images/img_home_blurfm_1600x1066.webp";
+import imgPersonalProjects from "../images/img_home_personal-projects_1600x1066.webp";
+import imgProfessionalWork from "../images/img_home_professional-work_1600x1066.webp";
+import imgSelectedVisualWork from "../images/img_home_selected-visual-work_1600x1066.webp";
 
 // Home "Selected projects" is a fixed, homepage-only lineup — independent of
 // the /projects content collection, so it can include work (Atlas, go.ar)
@@ -16,6 +22,8 @@ import { getBlogPosts } from "../lib/blog";
 interface SelectedProject {
   title: string;
   summary: string;
+  image: ImageMetadata;
+  alt: string;
   href?: string;
   externalUrl?: string;
   entryType?: string;
@@ -24,27 +32,37 @@ interface SelectedProject {
 const selectedProjects: SelectedProject[] = [
   {
     title: "Blur FM",
-    summary: "Independent online radio.",
-    externalUrl: "https://www.blurfm.com",
-    entryType: "external",
+    summary: "Online radio station, a playground for experimentation.",
+    image: imgBlurFm,
+    alt: "Blur FM, an independent online radio station",
   },
   {
-    title: "Atlas / Banner Scheduler",
-    summary: "Automated scheduling for banner and creative delivery.",
+    title: "Professional Work",
+    summary: "Digital products, internal tools and web platforms.",
+    image: imgProfessionalWork,
+    alt: "Selected professional work — digital products and web platforms",
   },
   {
-    title: "go.ar",
-    summary: "A personal link shortener and redirect system.",
+    title: "Independent Projects",
+    summary: "Self-hosted tools, microsites and personal web projects.",
+    image: imgPersonalProjects,
+    alt: "Selected personal projects — self-hosted tools and microsites",
   },
   {
-    title: "Selected branding",
-    summary: "Marks, wordmarks and small identity systems.",
+    title: "Selected Visual Work",
+    summary: "Logos, identities and selected graphic work over the years.",
+    image: imgSelectedVisualWork,
+    alt: "Selected visual work — logos and identity systems",
   },
 ];
 
 // "Notes from the lab" — the three most recent blog posts. Cards link
 // INTERNALLY to /blog/{slug}; nico.ar is only a secondary link on the post.
 const latestPosts = (await getBlogPosts()).slice(0, 3);
+
+// "Photography" — a small visual interlude sourced from Lo del Nico.
+// Resolves to [] (and the section is skipped) if it's unreachable at build time.
+const photoStripItems = await getPhotoStripItems();
 ---
 
 <BaseLayout>
@@ -87,18 +105,18 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
       </div>
     </section>
 
-    <!-- ── Selected projects (light neutral) ───────────────── -->
-    <section class="selected theme-light section" id="selected-projects">
+    <!-- ── Selected work (light neutral) ───────────────── -->
+    <section class="selected theme-light section" id="selected-work">
       <div class="container">
         <div class="selected__head">
           <div class="selected__heading">
-            <EyebrowLabel text="02 — Selected projects" theme="light" />
+            <EyebrowLabel text="02 — Selected work" theme="light" />
             <h2 class="selected__title">
               Things made <span class="text-cyan">on purpose</span>
             </h2>
           </div>
           <Button
-            label="View all projects"
+            label="View all work"
             href="/projects"
             variant="link"
             uppercase
@@ -112,6 +130,8 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
                 <FeaturedProjectItem
                   title={entry.title}
                   summary={entry.summary}
+                  image={entry.image}
+                  alt={entry.alt}
                   href={entry.href}
                   externalUrl={entry.externalUrl}
                   entryType={entry.entryType}
@@ -151,6 +171,9 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
       </div>
     </section>
 
+    <!-- ── Photography (light) ─────────────────────────────── -->
+    <PhotoStrip items={photoStripItems} />
+
     <!-- ── Notes from the lab / Blog (dark) ────────────────── -->
     {
       latestPosts.length > 0 && (
@@ -158,7 +181,7 @@ const latestPosts = (await getBlogPosts()).slice(0, 3);
           <div class="container">
             <div class="notes__head">
               <div class="notes__heading">
-                <EyebrowLabel text="03 — Blog" />
+                <EyebrowLabel text="04 — Blog" />
                 <h2 class="notes__title">Notes from the lab</h2>
                 <span class="notes__synced">Synced from nico.ar</span>
               </div>

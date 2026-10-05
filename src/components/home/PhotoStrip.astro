@@ -1,0 +1,154 @@
+---
+/**
+ * PhotoStrip — the Home "Photography" interlude, sourced from Lo del Nico.
+ *
+ * Deliberately not a carousel: no arrows, no dots, no per-photo captions, no
+ * card chrome. A single overflowing row of images at their natural aspect
+ * ratio, gently staggered on desktop, native horizontal swipe on mobile.
+ * Renders nothing if `items` is empty (Lo del Nico unreachable at build time).
+ */
+import type { PhotoStripItem } from "../../lib/lodelnico";
+import EyebrowLabel from "../ui/EyebrowLabel.astro";
+
+interface Props {
+  items: PhotoStripItem[];
+}
+
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section class="photo-strip theme-light section--sm" aria-label="Photography">
+      <div class="container photo-strip__head">
+        <EyebrowLabel text="03 — Photography" theme="light" />
+        <a
+          class="photo-strip__link"
+          href="https://lodelnico.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          lodelnico.com<span aria-hidden="true">&nearr;</span>
+        </a>
+      </div>
+
+      <ul class="photo-strip__row" role="list">
+        {items.map((item) => (
+          <li
+            class="photo-strip__item"
+            style={`--ar: ${item.width && item.height ? item.width / item.height : 1.4}`}
+          >
+            <a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.title}>
+              <img
+                src={item.image}
+                alt={item.title}
+                width={item.width}
+                height={item.height}
+                loading="lazy"
+                decoding="async"
+              />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .photo-strip {
+    overflow: hidden;
+  }
+
+  .photo-strip__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+
+  .photo-strip__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: var(--tracking-mono);
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color var(--transition);
+  }
+
+  .photo-strip__link:hover {
+    color: var(--accent-cyan);
+  }
+
+  /* The row starts aligned with the rest of the page grid, then overflows
+     past the right edge of the viewport uncontained — the bleed is the point,
+     not a bug to fix. */
+  .photo-strip__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    padding-inline-start: max(
+      var(--container-pad),
+      calc((100% - var(--container-max)) / 2 + var(--container-pad))
+    );
+    padding-inline-end: var(--space-6);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .photo-strip__row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .photo-strip__item {
+    flex: 0 0 auto;
+    height: clamp(190px, 24vw, 320px);
+    aspect-ratio: var(--ar);
+    scroll-snap-align: start;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .photo-strip__item a {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .photo-strip__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(30%);
+    transition:
+      filter var(--transition-slow),
+      transform var(--transition-slow);
+  }
+
+  .photo-strip__item a:hover img,
+  .photo-strip__item a:focus-visible img {
+    filter: grayscale(0%);
+    transform: scale(1.03);
+  }
+
+  /* A quiet zig-zag rhythm — curated, not a mechanical grid. Desktop only:
+     on touch the row should stay flat and predictable while swiping. */
+  @media (min-width: 641px) {
+    .photo-strip__item:nth-child(even) {
+      transform: translateY(var(--space-5));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .photo-strip__item {
+      height: clamp(160px, 52vw, 240px);
+    }
+  }
+</style>
